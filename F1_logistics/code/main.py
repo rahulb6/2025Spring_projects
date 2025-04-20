@@ -6,7 +6,6 @@ Author: Rahul Balasubramani(rahulb6) & Anushree Udhayakumar(au11)
 
 import random
 import matplotlib.pyplot as plt
-from geopy.distance import geodesic
 from geographiclib.geodesic import Geodesic
 import numpy as np
 from gen_circuit_details import circuit_dict as circuit_dict
@@ -17,9 +16,9 @@ def pert_sample(best_case, most_likely, worst_case):
     """
     Generates a sample using PERT .
     TODO: can you provide citations for the above formulas?
-    :param min_val: float, worst-case value
-    :param mode_val: float, most likely value
-    :param max_val: float, best-case value
+    :param worst_case: float
+    :param most_likely: float
+    :param best_case: float
     :return: float, a sample from the PERT distribution
 
     >>> s = pert_sample(0.4, 0.8, 1.0)
@@ -28,8 +27,8 @@ def pert_sample(best_case, most_likely, worst_case):
     """
     if not (best_case <= most_likely <= worst_case):
         raise ValueError("Invalid PERT parameters")
-    alpha  = 4 * (most_likely - best_case) / (worst_case - best_case) + 1
-    beta   = 4 * (worst_case - most_likely) / (worst_case - best_case) + 1
+    alpha  = (4 * (most_likely - best_case) / (worst_case - best_case)) + 1
+    beta   = (4 * (worst_case - most_likely) / (worst_case - best_case)) + 1
     sample = random.betavariate(alpha, beta)
     return best_case + sample * (worst_case - best_case)
 
@@ -52,7 +51,7 @@ def calculate_distance(lat1, lon1, lat2, lon2) -> float:
     distance_km = distance_meters / 1000
     return distance_km
 
-def simulate_crash(track_B, mode, breakdown, disturbance)-> float:
+def simulate_crash( mode, breakdown, disturbance)-> float:
     """
     This function is meant to return the total time it takes to fabricate a new part at the HQ, transport it to track location B
     :return: time, float
@@ -142,7 +141,7 @@ def transport_time(loc_A, loc_B, mode):
     return round(travel_time_hrs, 2)
 
 
-def simulate_disturbance():
+def simulate_disturbance(track_A, track_B, mode):
     """
     Simulates if a disturbance occurs and computes its delay. Returns 0 if no disturbance occurs.
     If it does, calculates delay = duration × severity factor.
@@ -153,7 +152,7 @@ def simulate_disturbance():
     if np.random.binomial(1, disturbance_prob):
         duration = pert_sample(2, 6, 48)  # best-most likely-worstDuration in hours
         severity = pert_sample(0.1,0.2, 1)  # Severity as a multiplier
-        delay = duration * severity + transport_time()
+        delay = duration * severity + transport_time(track_A, track_B, mode)
         return round(delay, 2)
 
     return 0
@@ -194,7 +193,7 @@ def simulator(crash, breakdown, disturbance, mode):
         return base_time
 
     elif crash == 1 and disturbance == 0:
-        total_delay = simulate_crash(track_B, mode, breakdown, disturbance)
+        total_delay = simulate_crash(mode, breakdown, disturbance)
         delivery_time = transport_time("HQ", track_B, mode)
         total_time = total_delay + delivery_time
         print(f"Total time after crash, delivery: {total_time} hrs")
@@ -209,7 +208,7 @@ def simulator(crash, breakdown, disturbance, mode):
 
     else:
         #track_A, track_B = valid_tracks()
-        total_delay = simulate_disturbance()
+        total_delay = simulate_disturbance(track_A, track_B, mode)
         delivery_time = transport_time(track_A, track_B, mode)
         total_time = total_delay + delivery_time
         print(f"Total time after disturbance, delivery: {total_time} hrs")
