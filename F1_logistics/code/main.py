@@ -212,6 +212,19 @@ def simulator(crash, breakdown, disturbance, mode):
         total_time = total_delay + delivery_time
         print(f"Total time after disturbance, delivery: {total_time} hrs")
         return total_time
+    
+# Check convergence of average delivery time
+def plot_convergence(crash=0, breakdown=0, disturbance=1, mode="road", iterations=100):
+    """
+    Helps us check if our MC simulation is giving us consistent results. It runs the simulation
+    multiple times and plots how the avg delivery time changes over time.
+    If the line flattens out, it means our simulation has "converged" and the average is stable.
+    """
+    avg_times = []
+    total_time = 0
+    valid_runs = 0
+
+    return 0
 
 if __name__ == "__main__":
     # HYPOTHESIS 0: Baseline scenario - ideal case
