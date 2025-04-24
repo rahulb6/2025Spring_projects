@@ -14,23 +14,22 @@ from gen_circuit_details import circuit_dict as circuit_dict
 # PERT function to generate sample
 def pert_sample(best_case, most_likely, worst_case):
     """
-    Generates a sample using PERT .
-    TODO: can you provide citations for the above formulas?
-    :param worst_case: float
-    :param most_likely: float
-    :param best_case: float
-    :return: float, a sample from the PERT distribution
+    For our F1 logistics project, this function returns a single expected value 
+    using the classic PERT formula used to estimate values like travel time,
+    fabrication time, or disturbance duration where we know the best, most likely, 
+    and worst-case scenarios.
 
-    >>> s = pert_sample(0.4, 0.8, 1.0)
-    >>> 0.4 <= s <= 1.0
-    True
+    Citation:
+    https://real-statistics.com/binomial-and-related-distributions/pert-distribution/
+    This version avoids randomness and gives a stable, realistic estimate.
     """
+
     if not (best_case <= most_likely <= worst_case):
-        raise ValueError("Invalid PERT parameters")
-    alpha  = (4 * (most_likely - best_case) / (worst_case - best_case)) + 1
-    beta   = (4 * (worst_case - most_likely) / (worst_case - best_case)) + 1
-    sample = random.betavariate(alpha, beta)
-    return best_case + sample * (worst_case - best_case)
+        raise ValueError("Invalid Input, make sure best ≤ most_likely ≤ worst")
+
+    expected_value = (best_case + 4 * most_likely + worst_case) / 6
+    return expected_value
+
 
 """
 #Calculate distance between 2 points
