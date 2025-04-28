@@ -52,15 +52,14 @@ def simulate_crash(track_A, track_B, mode, breakdown, disturbance) -> float:
     """
     spare_status = None
     Car_status = None
-
     fabrication_time = fabrication()
     #delivery_time = transport_time("HQ", track_B, mode)
     total_delay = fabrication_time
 
     if disturbance:
-        total_delay += simulate_disturbance(track_A, track_B, mode)
+        total_delay += simulate_disturbance("HQ", track_B, mode)
     if breakdown:
-        total_delay += simulate_breakdown(track_A, track_B, mode)
+        total_delay += simulate_breakdown("HQ", track_B, mode)
     return round(total_delay, 4)
 
 def fabrication():
