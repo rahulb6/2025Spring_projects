@@ -25,12 +25,8 @@ def pert_sample(best_case, most_likely, worst_case):
     >>> 0.4 <= s <= 1.0
     True
     """
-    if not (best_case <= most_likely <= worst_case):
-        raise ValueError("Invalid PERT parameters")
-    alpha  = (4 * (most_likely - best_case) / (worst_case - best_case)) + 1
-    beta   = (4 * (worst_case - most_likely) / (worst_case - best_case)) + 1
-    sample = random.betavariate(alpha, beta)
-    return best_case + sample * (worst_case - best_case)
+    expected_value = (best_case + 4 * most_likely + worst_case) / 6
+    return expected_value
 
 """
 #Calculate distance between 2 points
@@ -51,7 +47,7 @@ def calculate_distance(lat1, lon1, lat2, lon2) -> float:
     distance_km = distance_meters / 1000
     return distance_km
 
-def simulate_crash( mode, breakdown, disturbance)-> float:
+def simulate_crash(track_A, track_B, mode, breakdown, disturbance) -> float:
     """
     This function is meant to return the total time it takes to fabricate a new part at the HQ, transport it to track location B
     :return: time, float
@@ -64,9 +60,9 @@ def simulate_crash( mode, breakdown, disturbance)-> float:
     total_delay = fabrication_time
 
     if disturbance:
-        total_delay += simulate_disturbance()
+        total_delay += simulate_disturbance(track_A, track_B, mode)
     if breakdown:
-        total_delay += simulate_breakdown(mode)
+        total_delay += simulate_breakdown(track_A, track_B, mode)
     return round(total_delay, 4)
 
 def fabrication():
@@ -193,7 +189,7 @@ def simulator(crash, breakdown, disturbance, mode):
         return base_time
 
     elif crash == 1 and disturbance == 0:
-        total_delay = simulate_crash(mode, breakdown, disturbance)
+        total_delay = simulate_crash(track_A, track_B, mode, breakdown, disturbance)
         delivery_time = transport_time("HQ", track_B, mode)
         total_time = total_delay + delivery_time
         print(f"Total time after crash, delivery: {total_time} hrs")
@@ -213,8 +209,9 @@ def simulator(crash, breakdown, disturbance, mode):
         total_time = total_delay + delivery_time
         print(f"Total time after disturbance, delivery: {total_time} hrs")
         return total_time
-
+"""
 if __name__ == "__main__":
+
     # HYPOTHESIS 0: Baseline scenario - ideal case
     simulator(crash=0, breakdown=0, disturbance=0, mode="road")
     simulator(crash=0, breakdown=0, disturbance=0, mode="air")
@@ -232,3 +229,42 @@ if __name__ == "__main__":
     #HYPOTHESIS 3: simulating the occurrence of disturbance during normal transport
     simulator(crash=0, breakdown=0, disturbance=1, mode="road")
     simulator(crash=0, breakdown=0, disturbance=1, mode="air")
+"""
+if __name__ == "__main__":
+    # Ask user for number of simulations
+    n_simulations = int(input("Enter the number of simulations to run per hypothesis: "))
+
+    hypotheses = {
+        "Baseline (no crash, no breakdown, no disturbance) - Road": (0, 0, 0, "road"),
+        "Baseline (no crash, no breakdown, no disturbance) - Air": (0, 0, 0, "air"),
+        "Crash only - Road": (1, 0, 0, "road"),
+        "Crash only - Air": (1, 0, 0, "air"),
+        "Crash + Breakdown - Road": (1, 1, 0, "road"),
+        "Crash + Breakdown - Air": (1, 1, 0, "air"),
+        "Breakdown only - Road": (0, 1, 0, "road"),
+        "Breakdown only - Air": (0, 1, 0, "air"),
+        "Disturbance only - Road": (0, 0, 1, "road"),
+        "Disturbance only - Air": (0, 0, 1, "air")
+    }
+
+    for hypo_name, params in hypotheses.items():
+        crash, breakdown, disturbance, mode = params
+        results = []
+
+        for _ in range(n_simulations):
+            time_taken = simulator(crash=crash, breakdown=breakdown, disturbance=disturbance, mode=mode)
+            results.append(time_taken)
+
+        avg_time = round(np.mean(results), 2)
+        min_time = round(np.min(results), 2)
+        max_time = round(np.max(results), 2)
+        std_dev = round(np.std(results), 2)
+
+        print("\n=== Hypothesis:", hypo_name, "===")
+        print(f"Simulations run: {n_simulations}")
+        print(f"Average Time: {avg_time} hrs")
+        print(f"Minimum Time: {min_time} hrs")
+        print(f"Maximum Time: {max_time} hrs")
+        print(f"Standard Deviation: {std_dev} hrs")
+        print("="*40)
+
