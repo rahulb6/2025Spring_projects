@@ -220,6 +220,19 @@ def plot_convergence(crash=0, breakdown=0, disturbance=1, mode="road", iteration
     valid_runs = 0
 
     return 0
+
+def plot_histogram(results, hypothesis_name):
+    plt.figure(figsize=(8,6))
+    plt.hist(results, bins=15, color='skyblue', edgecolor='black')
+    plt.axvline(x=68, color='red', linestyle='--', linewidth=2, label='68 Hour Target')
+    plt.title(f"Delivery Time Distribution\n{hypothesis_name}", fontsize=14)
+    plt.xlabel("Delivery Time (hours)", fontsize=12)
+    plt.ylabel("Frequency", fontsize=12)
+    plt.legend()
+    plt.grid(True, linestyle='--', alpha=0.7)
+    plt.show()
+
+
 """
 if __name__ == "__main__":
 
@@ -277,5 +290,7 @@ if __name__ == "__main__":
         print(f"Minimum Time: {min_time} hrs")
         print(f"Maximum Time: {max_time} hrs")
         print(f"Standard Deviation: {std_dev} hrs")
-        print("="*40)
+        print("=" * 40)
+
+        plot_histogram(results, hypo_name)
 
