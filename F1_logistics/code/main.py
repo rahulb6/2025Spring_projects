@@ -201,9 +201,11 @@ def valid_tracks():
 
 def simulator(crash, breakdown, disturbance):
     """
-    This function simulates transport based on crash, breakdown, disturbance.
-    Now transport mode is dynamically decided based on continents.
+    Simulates transport between two consecutive F1 races.
+    Handles crash recovery, breakdowns, and disturbances.
+    Dynamically chooses transport mode (road or air) based on distance + continent.
     """
+
     # Get tracks and their information
     (track_A, track_A_date, track_A_continent,
      track_B, track_B_date, track_B_continent) = valid_tracks()
@@ -230,8 +232,8 @@ def simulator(crash, breakdown, disturbance):
     # Calculate distance
     distance_km = calculate_distance(lat_A, lon_A, lat_B, lon_B)
 
-    # Decide mode
-    if track_A_continent == track_B_continent and distance_km <= 7000:
+    # Decide mode based on distance and continent
+    if track_A_continent == track_B_continent and distance_km <= 5000:
         mode = "road"
     else:
         mode = "air"
@@ -240,48 +242,39 @@ def simulator(crash, breakdown, disturbance):
     print(f"Race A date: {track_A_date} ({track_A_continent})")
     print(f"Race B date: {track_B_date} ({track_B_continent})")
     print(f"Days between races: {days_between}")
+    print(f"Distance between tracks: {distance_km:.2f} km")
     print(f"Transport mode decided: {mode.upper()}")
     print(f"Max allowed hours: {max_allowed_hours}")
 
-    total_time = 0
-
+    # Now simulate based on hypothesis
     if crash == 0 and breakdown == 0 and disturbance == 0:
-        base_time = transport_time(track_A, track_B, mode)
-        print(f"Transport time (no crash, no breakdown, no disturbance): {base_time} hrs")
+        # Pure baseline transport
+        total_time = transport_time(track_A, track_B, mode)
+        print(f"Transport time (no crash, no breakdown, no disturbance): {total_time} hrs")
 
-        # Check if base_time <= max_allowed_hours
-        if base_time <= max_allowed_hours:
-            print("Transport fits within allowed time limit.")
-        else:
-            print("Transport exceeds allowed time limit.")
-
-        return base_time
-
-    elif crash == 1 and breakdown ==0 and disturbance == 0:
-        total_delay = simulate_crash(track_A, track_B, breakdown, disturbance)
-        delivery_time = transport_time("HQ", track_B, mode)
-        total_time = total_delay + delivery_time
+    elif crash == 1 and disturbance == 0:
+        # Crash case: fabrication + HQ-to-trackB transport + optional delays
+        total_time = simulate_crash(track_A, track_B, breakdown, disturbance)
         print(f"Total time after crash scenario: {total_time} hrs")
 
     elif crash == 0 and breakdown == 1 and disturbance == 0:
-        total_delay = simulate_breakdown(track_A, track_B, mode)
-        delivery_time = transport_time(track_A, track_B, mode)
-        total_time = total_delay + delivery_time
+        # Breakdown case: trackA to trackB with breakdown delay
+        total_time = simulate_breakdown(track_A, track_B, mode)
         print(f"Total time after breakdown scenario: {total_time} hrs")
 
     else:
-        total_delay = simulate_disturbance(track_A, track_B, mode)
-        delivery_time = transport_time(track_A, track_B, mode)
-        total_time = total_delay + delivery_time
+        # Disturbance case: trackA to trackB with disturbance delay
+        total_time = simulate_disturbance(track_A, track_B, mode)
         print(f"Total time after disturbance scenario: {total_time} hrs")
 
-    # Final transport check
+    # Final check against allowed max hours
     if total_time <= max_allowed_hours:
         print("Transport fits within allowed time limit.")
     else:
         print("Transport exceeds allowed time limit.")
 
     return total_time
+
 
 
 def plot_convergence(results, hypothesis_name):
