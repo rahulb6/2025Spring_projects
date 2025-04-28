@@ -14,11 +14,11 @@ from geographiclib.geodesic import Geodesic
 
 # List of circuits with names and lat/lon
 circuits = [
-    ("Melbourne Grand Prix Circuit", -37.8497, 144.968),
-    ("Shanghai International Circuit", 31.3389, 121.2189),
-    ("Suzuka International Racing Course", 34.8431, 136.5419),
     ("Bahrain International Circuit", 26.0325, 50.5106),
     ("Jeddah Corniche Circuit", 21.6319, 39.1044),
+    ("Melbourne Grand Prix Circuit", -37.8497, 144.968),
+    ("Suzuka International Racing Course", 34.8431, 136.5419),
+    ("Shanghai International Circuit", 31.3389, 121.2189),
     ("Miami International Autodrome", 25.9581, -80.2389),
     ("Autodromo Enzo e Dino Ferrari", 44.3439, 11.7167),
     ("Circuit de Monaco", 43.7347, 7.4206),
@@ -26,8 +26,8 @@ circuits = [
     ("Circuit Gilles-Villeneuve", 45.5000, -73.5228),
     ("Red Bull Ring", 47.2196, 14.7646),
     ("Silverstone Circuit", 52.0786, -1.0169),
-    ("Circuit de Spa-Francorchamps", 50.4372, 5.9714),
     ("Hungaroring", 47.5822, 19.2511),
+    ("Circuit de Spa-Francorchamps", 50.4372, 5.9714),
     ("Circuit Zandvoort", 52.3889, 4.5409),
     ("Autodromo Nazionale Monza", 45.6156, 9.2811),
     ("Baku City Circuit", 40.3725, 49.8533),

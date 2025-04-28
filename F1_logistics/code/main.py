@@ -294,7 +294,7 @@ if __name__ == "__main__":
         print(f"Standard Deviation: {std_dev} hrs")
         print("=" * 40)
 
-        #plot_histogram(results, hypo_name)
+        plot_histogram(results, hypo_name)
         plot_convergence(results, hypo_name)
 
 
