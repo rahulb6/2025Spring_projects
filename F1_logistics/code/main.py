@@ -125,7 +125,7 @@ def simulate_crash(track_A, track_B, breakdown, disturbance):
 
     # 5. Total time
     total_crash_time = fabrication_time + delivery_time + disturbance_delay + breakdown_delay
-    print(f"Total crash recovery time: {total_crash_time:.2f} hrs")
+    print(f"Total recovery and delivery time: {total_crash_time:.2f} hrs")
 
     return round(total_crash_time, 2)
 
@@ -168,7 +168,7 @@ def simulate_disturbance(track_A, track_B, mode):
     # Base transport time
     base_transport_time = transport_time(track_A, track_B, mode)
 
-    disturbance_prob = 0.1  # 10% chance of disturbance
+    disturbance_prob = 0.001  # 10% chance of disturbance
 
     if np.random.binomial(1, disturbance_prob):
         # If disturbance occurs
@@ -221,8 +221,17 @@ def simulator(crash, breakdown, disturbance):
     else:
         max_allowed_hours = 85
 
-    # Decide mode based on continent
-    if track_A_continent == track_B_continent:
+    # Get coordinates
+    lat_A = circuit_dict[track_A]["Latitude"]
+    lon_A = circuit_dict[track_A]["Longitude"]
+    lat_B = circuit_dict[track_B]["Latitude"]
+    lon_B = circuit_dict[track_B]["Longitude"]
+
+    # Calculate distance
+    distance_km = calculate_distance(lat_A, lon_A, lat_B, lon_B)
+
+    # Decide mode
+    if track_A_continent == track_B_continent and distance_km <= 7000:
         mode = "road"
     else:
         mode = "air"
@@ -281,6 +290,7 @@ def plot_convergence(results, hypothesis_name):
     plt.figure(figsize=(8,6))
     plt.plot(running_avg, label='Running Average')
     plt.axhline(68, color='red', linestyle='--', label='68 Hour Target')
+    plt.axhline(85, color='green', linestyle='--', label='85 Hour Target')
     plt.title(f"Convergence Plot\n{hypothesis_name}", fontsize=14)
     plt.xlabel("Number of Simulations", fontsize=12)
     plt.ylabel("Average Delivery Time (hours)", fontsize=12)
@@ -288,17 +298,18 @@ def plot_convergence(results, hypothesis_name):
     plt.grid(True, linestyle='--', alpha=0.7)
     plt.show()
 
-
 def plot_histogram(results, hypothesis_name):
     plt.figure(figsize=(8,6))
     plt.hist(results, bins=15, color='skyblue', edgecolor='black')
     plt.axvline(x=68, color='red', linestyle='--', linewidth=2, label='68 Hour Target')
+    plt.axvline(x=85, color='green', linestyle='--', linewidth=2, label='85 Hour Target')
     plt.title(f"Delivery Time Distribution\n{hypothesis_name}", fontsize=14)
     plt.xlabel("Delivery Time (hours)", fontsize=12)
     plt.ylabel("Frequency", fontsize=12)
     plt.legend()
     plt.grid(True, linestyle='--', alpha=0.7)
     plt.show()
+
 
 
 """
