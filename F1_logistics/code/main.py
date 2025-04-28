@@ -209,17 +209,19 @@ def simulator(crash, breakdown, disturbance, mode):
         return total_time
 
 
-def plot_convergence(crash=0, breakdown=0, disturbance=1, mode="road", iterations=100):
-    """
-    Helps us check if our MC simulation is giving us consistent results. It runs the simulation
-    multiple times and plots how the avg delivery time changes over time.
-    If the line flattens out, it means our simulation has "converged" and the average is stable.
-    """
-    avg_times = []
-    total_time = 0
-    valid_runs = 0
+def plot_convergence(results, hypothesis_name):
+    running_avg = np.cumsum(results) / np.arange(1, len(results) + 1)
 
-    return 0
+    plt.figure(figsize=(8,6))
+    plt.plot(running_avg, label='Running Average')
+    plt.axhline(68, color='red', linestyle='--', label='68 Hour Target')
+    plt.title(f"Convergence Plot\n{hypothesis_name}", fontsize=14)
+    plt.xlabel("Number of Simulations", fontsize=12)
+    plt.ylabel("Average Delivery Time (hours)", fontsize=12)
+    plt.legend()
+    plt.grid(True, linestyle='--', alpha=0.7)
+    plt.show()
+
 
 def plot_histogram(results, hypothesis_name):
     plt.figure(figsize=(8,6))
@@ -292,5 +294,7 @@ if __name__ == "__main__":
         print(f"Standard Deviation: {std_dev} hrs")
         print("=" * 40)
 
-        plot_histogram(results, hypo_name)
+        #plot_histogram(results, hypo_name)
+        plot_convergence(results, hypo_name)
+
 
