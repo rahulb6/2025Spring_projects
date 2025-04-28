@@ -277,6 +277,7 @@ def simulator(crash, breakdown, disturbance):
 
 
 
+
 def plot_convergence(results, hypothesis_name):
     running_avg = np.cumsum(results) / np.arange(1, len(results) + 1)
 
@@ -327,6 +328,8 @@ if __name__ == "__main__":
     simulator(crash=0, breakdown=0, disturbance=1, mode="air")
 """
 if __name__ == "__main__":
+    exceeding_cases = []
+
     # Ask user for number of simulations
     n_simulations = int(input("Enter the number of simulations to run per hypothesis: "))
 
