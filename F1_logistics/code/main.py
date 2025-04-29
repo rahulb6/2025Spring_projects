@@ -116,6 +116,7 @@ def transport_time(loc_A, loc_B, mode):
 
         # Total transport time
         travel_time_hrs = air_travel_time + local_road_time
+        travel_time_hrs += 5 # +5 for loading, unloading into and out of the cargo plane
         return round(travel_time_hrs, 2)
 
     else:
@@ -163,6 +164,7 @@ def simulate_crash(track_A, track_B):
     total_crash_time = fabrication_time + delivery_time + disturbance_delay + breakdown_delay
     """
     total_delay_time = fabrication_time + base_delivery_time
+
     print(f"Total recovery and delivery time: {total_delay_time:.2f} hrs")
     return round(total_delay_time, 2)
 
@@ -183,6 +185,7 @@ def simulate_breakdown(track_A, track_B, mode):
         best, most_likely, worst = 1, 3, 12  # best case there is just 1hr of delay, worst case being 12hrs
     elif mode == "air":
         best, most_likely, worst = 2, 3, 12
+
     else:
         raise ValueError("Mode must be 'road' or 'air'.")
 
@@ -253,7 +256,7 @@ def simulator(crash, breakdown, disturbance):
     if days_between == 7:
         max_allowed_hours = 58
     else:
-        max_allowed_hours = (65+5) # where the 5hrs is the loading unloading time
+        max_allowed_hours = (60+5) # where the 5hrs is the loading unloading time
 
     # Get coordinates
     lat_A = circuit_dict[track_A]["Latitude"]
@@ -324,7 +327,7 @@ def plot_convergence(results, hypothesis_name):
     plt.figure(figsize=(8,6))
     plt.plot(running_avg, label='Running Average')
     plt.axhline(58, color='red', linestyle='--', label='68 Hour Target')
-    plt.axhline(70, color='green', linestyle='--', label='85 Hour Target')
+    plt.axhline(65, color='green', linestyle='--', label='85 Hour Target')
     plt.title(f"Convergence Plot\n{hypothesis_name}", fontsize=14)
     plt.xlabel("Number of Simulations", fontsize=12)
     plt.ylabel("Average Delivery Time (hours)", fontsize=12)
@@ -343,7 +346,7 @@ def plot_histogram(results, hypothesis_name):
     plt.figure(figsize=(8,6))
     plt.hist(results, bins=15, color='skyblue', edgecolor='black')
     plt.axvline(x=58, color='red', linestyle='--', linewidth=2, label='68 Hour Target')
-    plt.axvline(x=70, color='green', linestyle='--', linewidth=2, label='85 Hour Target')
+    plt.axvline(x=65, color='green', linestyle='--', linewidth=2, label='85 Hour Target')
     plt.title(f"Delivery Time Distribution\n{hypothesis_name}", fontsize=14)
     plt.xlabel("Delivery Time (hours)", fontsize=12)
     plt.ylabel("Frequency", fontsize=12)
