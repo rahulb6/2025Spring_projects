@@ -152,29 +152,23 @@ def simulate_breakdown(track_A, track_B, mode):
     Simulates breakdown of carrier: trucks (road) or cargo planes (air).
     Adds additional delay if breakdown occurs.
     """
-
     # Base transport time
     delivery_time = transport_time(track_A, track_B, mode)
 
     # Set breakdown probability and PERT parameters
     if mode == "road":
-        breakdown_prob = 0.02  # 2% chance truck breakdown
-        best, most_likely, worst = 2, 3, 12  # Delay times in hours
+        best, most_likely, worst = 1, 3, 12  # Delay times in hours
     elif mode == "air":
-        breakdown_prob = 0.001  # 0.1% chance cargo plane issue
         best, most_likely, worst = 2, 3, 12  # Slightly shifted delay times
     else:
         raise ValueError("Mode must be 'road' or 'air'.")
 
     # Simulate breakdown occurrence
-    if np.random.binomial(1, breakdown_prob):
-        breakdown_delay = pert_sample(best, most_likely, worst)
-        print(f"Breakdown occurred during transport ({mode.upper()})! Extra delay: {breakdown_delay:.2f} hrs")
-        total_time = delivery_time + breakdown_delay
-        return round(total_time, 2)
-    else:
-        print(f"No breakdown during transport ({mode.upper()}).")
-        return round(delivery_time, 2)
+    breakdown_delay = pert_sample(best, most_likely, worst)
+    print(f"Breakdown occurred during transport ({mode.upper()})! Extra delay: {breakdown_delay:.2f} hrs")
+    total_time = delivery_time + breakdown_delay
+    return round(total_time, 2)
+
 
 def simulate_disturbance(track_A, track_B, mode):
     """
@@ -185,21 +179,16 @@ def simulate_disturbance(track_A, track_B, mode):
     # Base transport time
     base_transport_time = transport_time(track_A, track_B, mode)
 
-    disturbance_prob = 0.001  # 10% chance of disturbance
+    duration = pert_sample(2, 6, 48)  # Duration of disturbance in hours
+    severity = pert_sample(0.1, 0.2, 1)  # Severity multiplier
+    disturbance_delay = duration * severity
 
-    if np.random.binomial(1, disturbance_prob):
-        # If disturbance occurs
-        duration = pert_sample(2, 6, 48)  # Duration of disturbance in hours
-        severity = pert_sample(0.1, 0.2, 1)  # Severity multiplier
-        disturbance_delay = duration * severity
+    total_time = base_transport_time + disturbance_delay
 
-        total_time = base_transport_time + disturbance_delay
+    print(f"Disturbance occurred during transport ({mode.upper()})!")
+    print(f"Duration: {duration:.2f} hrs, Severity: {severity:.2f}, Extra delay: {disturbance_delay:.2f} hrs")
 
-        print(f"Disturbance occurred during transport ({mode.upper()})! Extra delay: {disturbance_delay:.2f} hrs")
-        return round(total_time, 2)
-    else:
-        print(f"No disturbance during transport ({mode.upper()}).")
-        return round(base_transport_time, 2)
+    return round(total_time, 2)
 
 def valid_tracks():
     circuit_names = list(circuit_dict.keys())
@@ -245,13 +234,11 @@ def simulator(crash, breakdown, disturbance):
     trucks, driven to the airport, unloaded from trucks, loaded onto cargo planes and then is flown to the destination, 
     unloaded into trucks which is then driven to the tracks. So the time for loading and unloading is roughly 5 hours.
     """
-
-
     # Decide transport max hours
     if days_between == 7:
         max_allowed_hours = 58
     else:
-        max_allowed_hours = (65+5)
+        max_allowed_hours = (65+5) # where the 5hrs is the loading unloading time
 
     # Get coordinates
     lat_A = circuit_dict[track_A]["Latitude"]
@@ -263,7 +250,7 @@ def simulator(crash, breakdown, disturbance):
     distance_km = calculate_distance(lat_A, lon_A, lat_B, lon_B)
 
     # Decide mode based on distance and continent
-    if track_A_continent == track_B_continent and distance_km <= 5000:
+    if track_A_continent == track_B_continent and distance_km <= 4000:
         mode = "road"
     else:
         mode = "air"
@@ -282,7 +269,7 @@ def simulator(crash, breakdown, disturbance):
         total_time = transport_time(track_A, track_B, mode)
         print(f"Transport time (no crash, no breakdown, no disturbance): {total_time} hrs")
 
-    elif crash == 1 and disturbance == 0:
+    elif crash == 1 and breakdown == 0 and disturbance == 0:
         # Crash case: fabrication + HQ-to-trackB transport + optional delays
         total_time = simulate_crash(track_A, track_B, breakdown, disturbance)
         print(f"Total time after crash scenario: {total_time} hrs")
@@ -292,7 +279,7 @@ def simulator(crash, breakdown, disturbance):
         total_time = simulate_breakdown(track_A, track_B, mode)
         print(f"Total time after breakdown scenario: {total_time} hrs")
 
-    else:
+    elif crash == 0 and breakdown == 0 and disturbance == 1:
         # Disturbance case: trackA to trackB with disturbance delay
         total_time = simulate_disturbance(track_A, track_B, mode)
         print(f"Total time after disturbance scenario: {total_time} hrs")
@@ -304,9 +291,6 @@ def simulator(crash, breakdown, disturbance):
         print("Transport exceeds allowed time limit.")
 
     return total_time
-
-
-
 
 def plot_convergence(results, hypothesis_name):
     running_avg = np.cumsum(results) / np.arange(1, len(results) + 1)
@@ -367,9 +351,10 @@ if __name__ == "__main__":
     hypotheses = {
         "Baseline (no crash, no breakdown, no disturbance)": (0, 0, 0),
         "Crash only": (1, 0, 0),
-        "Crash + Breakdown": (1, 1, 0),
-        #"Breakdown only": (0, 1, 0),
-        #"Disturbance only": (0, 0, 1)
+        #"Crash + Breakdown": (1, 1, 0),
+        #"Crash + Breakdown + Disturbance": (1, 1, 1),
+        "Breakdown only": (0, 1, 0),
+        "Disturbance only": (0, 0, 1)
     }
 
     for hypo_name, params in hypotheses.items():
