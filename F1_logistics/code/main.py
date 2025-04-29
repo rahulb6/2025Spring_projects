@@ -86,7 +86,21 @@ def transport_time(loc_A, loc_B, mode):
     if mode == "road":
         speed_kmph = pert_sample(100, 80, 48) #we have citation for this
     elif mode == "air":
-        speed_kmph = pert_sample(800, 700, 600)  #no citation for this
+        speed_kmph = pert_sample(800, 700, 600) # Air speed (flight portion)
+
+        local_road_speed_kmph = pert_sample(32.19, 40.23, 48.28) # Local road speeds for track <-> airport connection
+
+        local_distance_km_per_leg = 25 # Assume small local segments (~30 km each side, can tweak later if needed)
+
+        local_road_time = (2 * local_distance_km_per_leg) / local_road_speed_kmph  # d/s = hrs # Total local road time (both departure + arrival sides)
+
+        air_travel_time = distance_km / speed_kmph # Main air transport time
+
+        # Total transport time
+        travel_time_hrs = air_travel_time + local_road_time
+
+        return round(travel_time_hrs, 2)
+
     else:
         raise ValueError("Unsupported mode: use 'road' or 'air'.")
 
@@ -217,11 +231,24 @@ def simulator(crash, breakdown, disturbance):
     # Calculate days between races
     days_between = (track_B_date_dt - track_A_date_dt).days
 
+    # adding buffer times
+    """
+    for back-to-back races and roadways transport -> loading of paddock material/ priority stuff happens during the 
+    race, and thus no considerable downtime during "loading phase". The "unloading phase" is after the trucks
+    reach the destination which is not part of the "transportation time" we are calculating. So, no buffer time
+    is added for any roadways transportation.
+    
+    for those races that get deliveries through airways -> the paddock material will have to be packed and loaded into 
+    trucks, driven to the airport, unloaded from trucks, loaded onto cargo planes and then is flown to the destination, 
+    unloaded into trucks which is then driven to the tracks. So the time for loading and unloading is roughly 5 hours.
+    """
+
+
     # Decide transport max hours
     if days_between == 7:
-        max_allowed_hours = 68
+        max_allowed_hours = 58
     else:
-        max_allowed_hours = 85
+        max_allowed_hours = (65+5)
 
     # Get coordinates
     lat_A = circuit_dict[track_A]["Latitude"]
