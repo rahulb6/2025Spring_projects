@@ -1,9 +1,8 @@
 """
 IS597 Spring 2025 - Final Project
-F1 Logistics using Monte Carlo Simulation: Core Functions
+F1 Logistics using Monte Carlo Simulation
 Author: Rahul Balasubramani(rahulb6) & Anushree Udhayakumar(au11)
 """
-
 import random
 import matplotlib.pyplot as plt
 from geographiclib.geodesic import Geodesic
@@ -11,18 +10,17 @@ import numpy as np
 from gen_circuit_details import circuit_dict as circuit_dict
 from datetime import datetime
 
-
+#-------------------------------------------------HELPER FNS-----------------------------------------------------------
 # PERT function to generate sample
 def pert_sample(best_case, most_likely, worst_case):
     """
-    For our F1 logistics project, this function returns a single expected value
-    using the classic PERT formula used to estimate values like travel time,
-    fabrication time, or disturbance duration where we know the best, most likely,
-    and worst-case scenarios.
-
-    Citation:
-    https://real-statistics.com/binomial-and-related-distributions/pert-distribution/
-    This version avoids randomness and gives a stable, realistic estimate.
+    For our F1 logistics project, this function returns a single expected value but random value everytime.
+    Citation: https://real-statistics.com/binomial-and-related-distributions/pert-distribution/
+    :param best_case: what we consider the best case (like least time or most speed)
+    :param most_likely: what is most-likely to happen
+    :param worst_case: what we consider the worst case (like most time or least speed)
+    :return: floating value realistic value between best_case and worst_case and closer to most_likely
+    TODO: doctests
     """
     alpha = 4 * (most_likely - best_case) / (worst_case - best_case) + 1
     beta = 4 * (worst_case - most_likely) / (worst_case - best_case) + 1
@@ -30,11 +28,6 @@ def pert_sample(best_case, most_likely, worst_case):
     sample = random.betavariate(alpha, beta)
     return best_case + sample * (worst_case-best_case)
 
-"""
-#Calculate distance between 2 points
-def calculate_distance(coord1, coord2):
-    return geodesic(coord1, coord2).km
-"""
 def calculate_distance(lat1, lon1, lat2, lon2) -> float:
     """
     This function takes inputs of coordinates(lat-long) and computes the great-circle distance between.
@@ -43,7 +36,7 @@ def calculate_distance(lat1, lon1, lat2, lon2) -> float:
     :param lat2: Race location B latitude
     :param lon2: Race location B longitude
     :return: floating value that denotes the distance between the two points in km.
-    TODO: make sure the return value makes sense in km
+    TODO: doctests
     """
     distance_meters = Geodesic.WGS84.Inverse(lat1, lon1, lat2, lon2)['s12']
     distance_km = distance_meters / 1000
@@ -52,20 +45,36 @@ def calculate_distance(lat1, lon1, lat2, lon2) -> float:
 def fabrication():
     """
     This function is meant to return the total time it takes to fabricate the spare part(s)
-    :return:
-    TODO: what distribution does fabrication follow?
+    :return: floating value representing part's fabrication time - random each time.
+    TODO: doctests
     """
     fabrication_time = pert_sample(12, 18, 36)
     return fabrication_time
 
+def valid_tracks():
+    """
+    This function is mean to pick random consecutive tracks from the dictionary - random each time
+    """
+    circuit_names = list(circuit_dict.keys())
+
+    # Pick a random index except the last one
+    index = random.randint(0, len(circuit_names) - 2) #no last track
+
+    track_A = circuit_names[index]
+    track_B = circuit_names[index + 1]
+
+    track_A_info = circuit_dict[track_A]
+    track_B_info = circuit_dict[track_B]
+
+    return (track_A, track_A_info["RaceDate"], track_A_info["Continent"],
+            track_B, track_B_info["RaceDate"], track_B_info["Continent"])
+
 def transport_time(loc_A, loc_B, mode):
     """
-    Calculates transport time (in hours) from loc_A to loc_B.
-    Uses PERT-sampled speed and geodesic distance.
-
-    :param loc_A: 'HQ' or name of circuit A
+    Calculates transport time (in hours) from loc_A to loc_B. Simulator decided the mode (road/air) and sent it here.
+    :param loc_A: name of circuit A, later changed to "HQ"
     :param loc_B: name of circuit B
-    :param mode: 'road' (default), or 'air' if needed later
+    :param mode: air or road
     :return: time in hours (float)
     """
     # HQ coordinates (Milton Keynes)
@@ -87,47 +96,57 @@ def transport_time(loc_A, loc_B, mode):
 
     # Sample speed using PERT
     if mode == "road":
-        speed_kmph = pert_sample(100, 80, 48) #we have citation for this
+        speed_kmph = pert_sample(100, 80, 48) #most speed - most-likely speed - lowest speed (highways/ interstate)
+        # https://dhl-freight-connections.com/en/business/truck-speed-limits-europe/
     elif mode == "air":
         speed_kmph = pert_sample(800, 700, 600) # Air speed (flight portion)
 
-        local_road_speed_kmph = pert_sample(32.19, 40.23, 48.28) # Local road speeds for track <-> airport connection
+        # Local road speeds for track <-> airport connection
+        # https://www.bts.gov/browse-statistical-products-and-data/info-gallery/average-truck-speed-mph-bottleneck-locations
+        local_road_speed_kmph = pert_sample(32.19, 40.23, 48.28)
 
-        local_distance_km_per_leg = 25 # Assume small local segments (~30 km each side, can tweak later if needed)
+        # assume small local segments (~20 km each side, can tweak later if needed)
+        local_distance_km_per_leg = 20
 
-        local_road_time = (2 * local_distance_km_per_leg) / local_road_speed_kmph  # d/s = hrs # Total local road time (both departure + arrival sides)
+        # d/s = hrs # Total local road time (both departure + arrival sides)
+        local_road_time = (2 * local_distance_km_per_leg) / local_road_speed_kmph
 
-        air_travel_time = distance_km / speed_kmph # Main air transport time
+        # Main air transport time
+        air_travel_time = distance_km / speed_kmph
 
         # Total transport time
         travel_time_hrs = air_travel_time + local_road_time
-
         return round(travel_time_hrs, 2)
 
     else:
         raise ValueError("Unsupported mode: use 'road' or 'air'.")
 
-    # Time = distance / speed
     travel_time_hrs = distance_km / speed_kmph
     return round(travel_time_hrs, 2)
 
-
-def simulate_crash(track_A, track_B, breakdown, disturbance):
+#--------------------------------------------SIMULATORS----------------------------------------------------------------
+#def simulate_crash(track_A, track_B, breakdown, disturbance):
+def simulate_crash(track_A, track_B):
     """
     Simulates a crash scenario where spare parts need to be fabricated and flown from HQ to the next track.
     Always assumes air transport due to urgency.
+    :param: track_A: name of circuit A
+    :param: track_B: name of circuit B
+    :return: total delayed transportation time
     """
-
     print(f"Crash at {track_A}. Spare parts flown from HQ to {track_B}.")
 
-    # 1. Fabrication time
-    fabrication_time = fabrication()  # Assume you already have a fabrication() function returning sampled hours
-    print(f"Fabrication time: {fabrication_time:.2f} hrs")
+    # Fabrication time
+    fabrication_time = fabrication()  # Returns random fabrication time each time
 
-    # 2. Transport time from HQ to Track B (always by air)
-    delivery_time = transport_time("HQ", track_B, "air")
-    print(f"Transport time (air): {delivery_time:.2f} hrs")
+    # Transport time from HQ to Track B (always by air because if the teams
+    # need the part to be flown in from HQ, then 100% of time, it is an emergency and the delivery needs to happen asap.
+    # So airways is the better choice)
+    base_delivery_time = transport_time("HQ", track_B, "air")
+    print(f"Transport time (air): {base_delivery_time:.2f} hrs")
 
+    """
+    ------this section was included when we wanted to simulate a crash + breakdown (+ disturbance)------
     # 3. If disturbance happens
     disturbance_delay = 0
     if disturbance:
@@ -139,34 +158,38 @@ def simulate_crash(track_A, track_B, breakdown, disturbance):
     if breakdown:
         breakdown_delay = simulate_breakdown("HQ", track_B, "air")
         print(f"Breakdown delay: {breakdown_delay:.2f} hrs")
-
+    
     # 5. Total time
     total_crash_time = fabrication_time + delivery_time + disturbance_delay + breakdown_delay
-    print(f"Total recovery and delivery time: {total_crash_time:.2f} hrs")
-
-    return round(total_crash_time, 2)
+    """
+    total_delay_time = fabrication_time + base_delivery_time
+    print(f"Total recovery and delivery time: {total_delay_time:.2f} hrs")
+    return round(total_delay_time, 2)
 
 
 def simulate_breakdown(track_A, track_B, mode):
     """
-    Simulates breakdown of carrier: trucks (road) or cargo planes (air).
-    Adds additional delay if breakdown occurs.
+    Simulates breakdown of carrier: trucks (road) or cargo planes (air). Adds additional delay if breakdown occurs.
+    :param track_A: name of circuit A
+    :param track_B: name of circuit B
+    :param mode: air or road
+    :return: total delayed transportation time because of breakdown
     """
     # Base transport time
-    delivery_time = transport_time(track_A, track_B, mode)
+    base_delivery_time = transport_time(track_A, track_B, mode)
 
     # Set breakdown probability and PERT parameters
     if mode == "road":
-        best, most_likely, worst = 1, 3, 12  # Delay times in hours
+        best, most_likely, worst = 1, 3, 12  # best case there is just 1hr of delay, worst case being 12hrs
     elif mode == "air":
-        best, most_likely, worst = 2, 3, 12  # Slightly shifted delay times
+        best, most_likely, worst = 2, 3, 12
     else:
         raise ValueError("Mode must be 'road' or 'air'.")
 
     # Simulate breakdown occurrence
     breakdown_delay = pert_sample(best, most_likely, worst)
     print(f"Breakdown occurred during transport ({mode.upper()})! Extra delay: {breakdown_delay:.2f} hrs")
-    total_time = delivery_time + breakdown_delay
+    total_time = base_delivery_time + breakdown_delay
     return round(total_time, 2)
 
 
@@ -174,8 +197,11 @@ def simulate_disturbance(track_A, track_B, mode):
     """
     Simulates if a disturbance occurs (customs delay, security delay, weather).
     Adds disturbance delay on top of normal transport time.
+    :param track_A: name of circuit A
+    :param track_B: name of circuit B
+    :param mode: air or road
+    :return: total delayed transportation time because of disturbance
     """
-
     # Base transport time
     base_transport_time = transport_time(track_A, track_B, mode)
 
@@ -189,27 +215,16 @@ def simulate_disturbance(track_A, track_B, mode):
     print(f"Duration: {duration:.2f} hrs, Severity: {severity:.2f}, Extra delay: {disturbance_delay:.2f} hrs")
 
     return round(total_time, 2)
-
-def valid_tracks():
-    circuit_names = list(circuit_dict.keys())
-
-    # Pick a random index except the last one
-    index = random.randint(0, len(circuit_names) - 2)
-
-    track_A = circuit_names[index]
-    track_B = circuit_names[index + 1]
-
-    track_A_info = circuit_dict[track_A]
-    track_B_info = circuit_dict[track_B]
-
-    return (track_A, track_A_info["RaceDate"], track_A_info["Continent"],
-            track_B, track_B_info["RaceDate"], track_B_info["Continent"])
-
+#---------------------------------------THE SIMULATOR that calls other simulators---------------------------------------
 def simulator(crash, breakdown, disturbance):
     """
-    Simulates transport between two consecutive F1 races.
-    Handles crash recovery, breakdowns, and disturbances.
+    Simulates transport between two consecutive F1 races. Handles crash recovery, breakdowns, and disturbances.
     Dynamically chooses transport mode (road or air) based on distance + continent.
+    :param crash: 0 or 1. If 1, simulates a crash at the source track that requires spare parts delivery from HQ.
+    :param breakdown: 0 or 1. If 1, simulates a breakdown delay during normal transport.
+    :param disturbance: 0 or 1. If 1, simulates an external disturbance such as customs or weather delay.
+
+    :return: float. Total time (in hours) taken for transport including base time and any applicable delays.
     """
 
     # Get tracks and their information
@@ -271,7 +286,7 @@ def simulator(crash, breakdown, disturbance):
 
     elif crash == 1 and breakdown == 0 and disturbance == 0:
         # Crash case: fabrication + HQ-to-trackB transport + optional delays
-        total_time = simulate_crash(track_A, track_B, breakdown, disturbance)
+        total_time = simulate_crash(track_A, track_B)
         print(f"Total time after crash scenario: {total_time} hrs")
 
     elif crash == 0 and breakdown == 1 and disturbance == 0:
@@ -292,7 +307,18 @@ def simulator(crash, breakdown, disturbance):
 
     return total_time
 
+#--------------------------------------------------VISUALIZERS----------------------------------------------------------
 def plot_convergence(results, hypothesis_name):
+    """
+    Plots a convergence graph showing the running average of delivery times over simulations.
+    "Running average" or "running mean" refers to the mean value we get as simulations increase. It denotes, how
+    the mean value progresses over time as random values get generated.
+
+    :param results: list[float] - A list of delivery times (in hours) from repeated simulation runs.
+    :param hypothesis_name: str. A label indicating which hypothesis/scenario the data corresponds to.
+
+    :return: displays a matplotlib plot with reference lines for 58 and 70 hour thresholds.
+    """
     running_avg = np.cumsum(results) / np.arange(1, len(results) + 1)
 
     plt.figure(figsize=(8,6))
@@ -307,6 +333,13 @@ def plot_convergence(results, hypothesis_name):
     plt.show()
 
 def plot_histogram(results, hypothesis_name):
+    """
+    Plots a histogram of delivery times to visualize the distribution of simulation results.
+    :param results: list[float]. A list of delivery times (in hours) from simulation runs
+    :param hypothesis_name: str. A label describing the simulation scenario
+
+    :return: displays a histogram with ref lines for 58 (road, incl buffer) and 70 (air, incl buffer) hr thresholds.
+    """
     plt.figure(figsize=(8,6))
     plt.hist(results, bins=15, color='skyblue', edgecolor='black')
     plt.axvline(x=58, color='red', linestyle='--', linewidth=2, label='68 Hour Target')
@@ -318,29 +351,6 @@ def plot_histogram(results, hypothesis_name):
     plt.grid(True, linestyle='--', alpha=0.7)
     plt.show()
 
-
-
-"""
-if __name__ == "__main__":
-
-    # HYPOTHESIS 0: Baseline scenario - ideal case
-    simulator(crash=0, breakdown=0, disturbance=0, mode="road")
-    simulator(crash=0, breakdown=0, disturbance=0, mode="air")
-
-    #HYPOTHESIS 1: simulating crash at circuit A, and spare parts being fabricated and dent from HQ to circuit B
-    simulator(crash=1, breakdown=0, disturbance=0,mode="road")
-    simulator(crash=1, breakdown=0, disturbance=0, mode="air")
-    simulator(crash=1, breakdown=1, disturbance=0, mode="road")
-    simulator(crash=1, breakdown=1, disturbance=0, mode="air")
-
-    #HYPOTHESIS 2: simulating the occurrence of breakdown
-    simulator(crash=0, breakdown=1, disturbance=0, mode="air")
-    simulator(crash=0, breakdown=1, disturbance=0, mode="road")
-
-    #HYPOTHESIS 3: simulating the occurrence of disturbance during normal transport
-    simulator(crash=0, breakdown=0, disturbance=1, mode="road")
-    simulator(crash=0, breakdown=0, disturbance=1, mode="air")
-"""
 if __name__ == "__main__":
     exceeding_cases = []
 
@@ -351,8 +361,8 @@ if __name__ == "__main__":
     hypotheses = {
         "Baseline (no crash, no breakdown, no disturbance)": (0, 0, 0),
         "Crash only": (1, 0, 0),
-        #"Crash + Breakdown": (1, 1, 0),
-        #"Crash + Breakdown + Disturbance": (1, 1, 1),
+        #"Crash + Breakdown": (1, 1, 0), # too unrealistic
+        #"Crash + Breakdown + Disturbance": (1, 1, 1), # too unrealistic
         "Breakdown only": (0, 1, 0),
         "Disturbance only": (0, 0, 1)
     }
