@@ -24,8 +24,11 @@ def pert_sample(best_case, most_likely, worst_case):
     https://real-statistics.com/binomial-and-related-distributions/pert-distribution/
     This version avoids randomness and gives a stable, realistic estimate.
     """
-    expected_value = (best_case + 4 * most_likely + worst_case) / 6
-    return expected_value
+    alpha = 4 * (most_likely - best_case) / (worst_case - best_case) + 1
+    beta = 4 * (worst_case - most_likely) / (worst_case - best_case) + 1
+
+    sample = random.betavariate(alpha, beta)
+    return best_case + sample * (worst_case-best_case)
 
 """
 #Calculate distance between 2 points
