@@ -310,8 +310,8 @@ def plot_convergence(results, hypothesis_name):
 
     plt.figure(figsize=(8,6))
     plt.plot(running_avg, label='Running Average')
-    plt.axhline(68, color='red', linestyle='--', label='68 Hour Target')
-    plt.axhline(85, color='green', linestyle='--', label='85 Hour Target')
+    plt.axhline(58, color='red', linestyle='--', label='68 Hour Target')
+    plt.axhline(70, color='green', linestyle='--', label='85 Hour Target')
     plt.title(f"Convergence Plot\n{hypothesis_name}", fontsize=14)
     plt.xlabel("Number of Simulations", fontsize=12)
     plt.ylabel("Average Delivery Time (hours)", fontsize=12)
@@ -322,8 +322,8 @@ def plot_convergence(results, hypothesis_name):
 def plot_histogram(results, hypothesis_name):
     plt.figure(figsize=(8,6))
     plt.hist(results, bins=15, color='skyblue', edgecolor='black')
-    plt.axvline(x=68, color='red', linestyle='--', linewidth=2, label='68 Hour Target')
-    plt.axvline(x=85, color='green', linestyle='--', linewidth=2, label='85 Hour Target')
+    plt.axvline(x=58, color='red', linestyle='--', linewidth=2, label='68 Hour Target')
+    plt.axvline(x=70, color='green', linestyle='--', linewidth=2, label='85 Hour Target')
     plt.title(f"Delivery Time Distribution\n{hypothesis_name}", fontsize=14)
     plt.xlabel("Delivery Time (hours)", fontsize=12)
     plt.ylabel("Frequency", fontsize=12)
