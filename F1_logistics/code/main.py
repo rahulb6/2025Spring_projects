@@ -367,9 +367,9 @@ if __name__ == "__main__":
     hypotheses = {
         "Baseline (no crash, no breakdown, no disturbance)": (0, 0, 0),
         "Crash only": (1, 0, 0),
-        #"Crash + Breakdown": (1, 1, 0),
-        "Breakdown only": (0, 1, 0),
-        "Disturbance only": (0, 0, 1)
+        "Crash + Breakdown": (1, 1, 0),
+        #"Breakdown only": (0, 1, 0),
+        #"Disturbance only": (0, 0, 1)
     }
 
     for hypo_name, params in hypotheses.items():
