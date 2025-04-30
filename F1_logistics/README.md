@@ -18,6 +18,15 @@ These are the constants in our simulation that reflect reality as closely as pos
 - **Air Cargo:** 1 shipment per team  
 - **Delivery Deadline:** 96 hours (FIA rule for setup completion before race)
 
+To Do:
+1. work on making the baseline itself a bit more realistic or justify strongly why the current average delivery time is proper.
+2. Use other statistics like median to compare hypothesis
+3. do doctests
+4. make loading-unloading dynamic using pert
+5. do not assume 20kms between airport and track - include airport coordinates and calcualte distance dynamically
+6. consider moving non-damaged parts from track_A to track_B
+7. Do README
+
 
 
 ## Variables:
@@ -29,7 +38,7 @@ These are the constants in our simulation that reflect reality as closely as pos
 
 ## Code Structure:
 
-We’ve broken the simulation into modular functions and a class-based simulator to keep it structured and reusable:
+We’ve broken the simulation into modular functions to keep it structured and reusable:
 
 
 
