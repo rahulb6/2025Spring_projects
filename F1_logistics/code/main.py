@@ -10,7 +10,7 @@ Be sure to check out the map.py too!
 
 Here is how we've designed the RedBull's logistics (Imagine you are the team's Logistics and Risk manager):
 - We will prefer roadways transportation through custom trucks if the next race destination is in the same continent
-and if the distance between the locations is less than 4000Km
+and if the distance between the locations is less than 4000Km; airways in any other case.
 -
 
 TODO: include a suppress_output mode
