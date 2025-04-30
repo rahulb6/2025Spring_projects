@@ -6,6 +6,12 @@ To understand the stakes of logistics :
 1. https://www.youtube.com/watch?v=n6uWuL4_pDI
 2. https://www.youtube.com/watch?v=6OLVFa8YRfM
 3. https://www.youtube.com/watch?v=m8p3vRsXz1k
+Be sure to check out the map.py too!
+
+Here is how we've designed the RedBull's logistics (Imagine you are the team's Logistics and Risk manager):
+- We will prefer roadways transportation through custom trucks if the next race destination is in the same continent
+and if the distance between the locations is less than 4000Km
+-
 
 TODO: include a suppress_output mode
 """
@@ -13,11 +19,10 @@ import random
 import matplotlib.pyplot as plt
 from geographiclib.geodesic import Geodesic
 import numpy as np
-from gen_circuit_details import circuit_dict as circuit_dict
+from gen_circuit_details import circuit_dict as circuit_dict # another .py in github
 from datetime import datetime
 
 #-------------------------------------------------HELPER FNS-----------------------------------------------------------
-# PERT function to generate sample
 def pert_sample(best_case, most_likely, worst_case):
     """
     For our F1 logistics project, this function returns a single expected value but random value everytime.
@@ -60,6 +65,7 @@ def fabrication():
 def valid_tracks():
     """
     This function is mean to pick random consecutive tracks from the dictionary - random each time
+    :return: track_A and track_B's name, raceDate, Continent
     """
     circuit_names = list(circuit_dict.keys())
 
@@ -149,10 +155,10 @@ def simulate_crash(track_A, track_B, mode):
     # calculating time for track_A to track_B - moving the non-damaged parts
     base_delivery_time_A = transport_time(track_A, track_B, mode)
 
-    # Transport time from HQ to Track B (always by air because if the teams
-    # need the part to be flown in from HQ, ie 100% of time, it is an emergency and the delivery needs to happen asap.
-    # So airways is the better choice)
+    # calculating time for HQ to track_B - getting new parts
     base_delivery_time_B = transport_time("HQ", track_B, "air")
+
+    # if any delay, the delay would be caused by which ever leg of transportation took the longest
     base_delivery_time = max(base_delivery_time_B, base_delivery_time_A)
     print(f"Transport time (air): {base_delivery_time:.2f} hrs")
 
@@ -160,8 +166,6 @@ def simulate_crash(track_A, track_B, mode):
 
     print(f"Total recovery and delivery time: {total_delay_time:.2f} hrs")
     return round(total_delay_time, 2)
-
-
 
 def simulate_breakdown(track_A, track_B, mode):
     """
