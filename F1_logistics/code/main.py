@@ -105,7 +105,7 @@ def transport_time(loc_A, loc_B, mode):
         # https://www.bts.gov/browse-statistical-products-and-data/info-gallery/average-truck-speed-mph-bottleneck-locations
         local_road_speed_kmph = pert_sample(32.19, 40.23, 48.28)
 
-        # assume small local segments (~20 km each side, can tweak later if needed)
+        # assumed distance between track and airport (~20 km *each side, can tweak later if needed)
         local_distance_km_per_leg = 20
 
         # d/s = hrs # Total local road time (both departure + arrival sides)
