@@ -106,7 +106,7 @@ def transport_time(loc_A, loc_B, mode):
         local_road_speed_kmph = pert_sample(32.19, 40.23, 48.28)
 
         # assumed distance between track and airport (~20 km *each side, can tweak later if needed)
-        local_distance_km_per_leg = 20
+        local_distance_km_per_leg = 20 #assumed
 
         # d/s = hrs # Total local road time (both departure + arrival sides)
         local_road_time = (2 * local_distance_km_per_leg) / local_road_speed_kmph
