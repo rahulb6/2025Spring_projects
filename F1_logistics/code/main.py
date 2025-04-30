@@ -2,6 +2,12 @@
 IS597 Spring 2025 - Final Project
 F1 Logistics using Monte Carlo Simulation
 Author: Rahul Balasubramani(rahulb6) & Anushree Udhayakumar(au11)
+To understand the stakes of logistics :
+1. https://www.youtube.com/watch?v=n6uWuL4_pDI
+2. https://www.youtube.com/watch?v=6OLVFa8YRfM
+3. https://www.youtube.com/watch?v=m8p3vRsXz1k
+
+TODO: include a suppress_output mode
 """
 import random
 import matplotlib.pyplot as plt
@@ -127,7 +133,7 @@ def transport_time(loc_A, loc_B, mode):
 
 #--------------------------------------------SIMULATORS----------------------------------------------------------------
 #def simulate_crash(track_A, track_B, breakdown, disturbance):
-def simulate_crash(track_A, track_B):
+def simulate_crash(track_A, track_B, mode):
     """
     Simulates a crash scenario where spare parts need to be fabricated and flown from HQ to the next track.
     Always assumes air transport due to urgency.
@@ -140,29 +146,16 @@ def simulate_crash(track_A, track_B):
     # Fabrication time
     fabrication_time = fabrication()  # Returns random fabrication time each time
 
+    # calculating time for track_A to track_B - moving the non-damaged parts
+    base_delivery_time_A = transport_time(track_A, track_B, mode)
+
     # Transport time from HQ to Track B (always by air because if the teams
-    # need the part to be flown in from HQ, then 100% of time, it is an emergency and the delivery needs to happen asap.
+    # need the part to be flown in from HQ, ie 100% of time, it is an emergency and the delivery needs to happen asap.
     # So airways is the better choice)
-    base_delivery_time = transport_time("HQ", track_B, "air")
+    base_delivery_time_B = transport_time("HQ", track_B, "air")
+    base_delivery_time = max(base_delivery_time_B, base_delivery_time_A)
     print(f"Transport time (air): {base_delivery_time:.2f} hrs")
 
-    """
-    ------this section was included when we wanted to simulate a crash + breakdown (+ disturbance)------
-    # 3. If disturbance happens
-    disturbance_delay = 0
-    if disturbance:
-        disturbance_delay = simulate_disturbance("HQ", track_B, "air")
-        print(f"Disturbance delay: {disturbance_delay:.2f} hrs")
-
-    # 4. If breakdown happens (very rare in air)
-    breakdown_delay = 0
-    if breakdown:
-        breakdown_delay = simulate_breakdown("HQ", track_B, "air")
-        print(f"Breakdown delay: {breakdown_delay:.2f} hrs")
-    
-    # 5. Total time
-    total_crash_time = fabrication_time + delivery_time + disturbance_delay + breakdown_delay
-    """
     total_delay_time = fabrication_time + base_delivery_time
 
     print(f"Total recovery and delivery time: {total_delay_time:.2f} hrs")
@@ -289,7 +282,7 @@ def simulator(crash, breakdown, disturbance):
 
     elif crash == 1 and breakdown == 0 and disturbance == 0:
         # Crash case: fabrication + HQ-to-trackB transport + optional delays
-        total_time = simulate_crash(track_A, track_B)
+        total_time = simulate_crash(track_A, track_B, mode)
         print(f"Total time after crash scenario: {total_time} hrs")
 
     elif crash == 0 and breakdown == 1 and disturbance == 0:
@@ -321,6 +314,8 @@ def plot_convergence(results, hypothesis_name):
     :param hypothesis_name: str. A label indicating which hypothesis/scenario the data corresponds to.
 
     :return: displays a matplotlib plot with reference lines for 58 and 70 hour thresholds.
+
+    how to do doctest: don't or test for any calculations it does or test the return object of this function
     """
     running_avg = np.cumsum(results) / np.arange(1, len(results) + 1)
 
