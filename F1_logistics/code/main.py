@@ -162,6 +162,7 @@ def simulate_crash(track_A, track_B, mode):
     return round(total_delay_time, 2)
 
 
+
 def simulate_breakdown(track_A, track_B, mode):
     """
     Simulates breakdown of carrier: trucks (road) or cargo planes (air). Adds additional delay if breakdown occurs.
