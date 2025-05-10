@@ -85,6 +85,9 @@ def valid_tracks():
     """
     This function is mean to pick random consecutive tracks from the dictionary - random each time
     :return: track_A and track_B's name, raceDate, Continent
+    >>> result = valid_tracks()
+    >>> isinstance(result, tuple) and len(result) == 6
+    True
     """
     circuit_names = list(circuit_dict.keys())
 
@@ -107,6 +110,12 @@ def transport_time(loc_A, loc_B, mode):
     :param loc_B: name of circuit B
     :param mode: air or road
     :return: time in hours (float)
+
+    >>> result = transport_time("locA", "locB", "road")
+    True
+    >>> result = transport_time("locA", "locB", "air")
+    True
+    >>> transport_time("locA", "locB", "helicopter")
     """
     # HQ coordinates (Milton Keynes)
     hq_lat, hq_lon = 52.0406, -0.7594
