@@ -36,6 +36,13 @@ def pert_sample(best_case, most_likely, worst_case):
     >>> 10 <= ans <= 30
     True
 
+    >>> ans = pert_sample(200.456,557,909.321)
+    >>> 200.456 <= ans <= 909.321
+    True
+
+    >>> ans = pert_sample(200.456,557,909.321)
+    >>> type(ans)
+    <class 'float'>
     """
     alpha = 4 * (most_likely - best_case) / (worst_case - best_case) + 1
     beta = 4 * (worst_case - most_likely) / (worst_case - best_case) + 1
@@ -51,7 +58,13 @@ def calculate_distance(lat1, lon1, lat2, lon2) -> float:
     :param lat2: Race location B latitude
     :param lon2: Race location B longitude
     :return: floating value that denotes the distance between the two points in km.
-    TODO: doctests
+
+    >>> round(calculate_distance(-37.8497, 144.968, 31.3389, 121.2189), 1)
+    8047.2
+
+    >>> round(calculate_distance(31.3389, 121.2189, 34.8431, 136.5419), 1)  # Shanghai → Suzuka
+    1480.6
+
     """
     distance_meters = Geodesic.WGS84.Inverse(lat1, lon1, lat2, lon2)['s12']
     distance_km = distance_meters / 1000
