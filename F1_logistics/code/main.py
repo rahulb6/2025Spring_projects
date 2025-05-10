@@ -31,7 +31,11 @@ def pert_sample(best_case, most_likely, worst_case):
     :param most_likely: what is most-likely to happen
     :param worst_case: what we consider the worst case (like most time or least speed)
     :return: floating value realistic value between best_case and worst_case and closer to most_likely
-    TODO: doctests
+
+    >>> ans=pert_sample(10,20,30)
+    >>> 10 <= ans <= 30
+    True
+
     """
     alpha = 4 * (most_likely - best_case) / (worst_case - best_case) + 1
     beta = 4 * (worst_case - most_likely) / (worst_case - best_case) + 1
@@ -128,7 +132,9 @@ def transport_time(loc_A, loc_B, mode):
 
         # Total transport time
         travel_time_hrs = air_travel_time + local_road_time
-        travel_time_hrs += 5 # +5 for loading, unloading into and out of the cargo plane
+        loading_unloading_delay = pert_sample(4, 5, 10)
+        travel_time_hrs += loading_unloading_delay
+
         return round(travel_time_hrs, 2)
 
     else:
@@ -160,7 +166,7 @@ def simulate_crash(track_A, track_B, mode):
 
     # if any delay, the delay would be caused by which ever leg of transportation took the longest
     base_delivery_time = max(base_delivery_time_B, base_delivery_time_A)
-    print(f"Transport time (air): {base_delivery_time:.2f} hrs")
+    print(f"Transport time (max of transport time from track_A and HQ): {base_delivery_time:.2f} hrs")
 
     total_delay_time = fabrication_time + base_delivery_time
 
@@ -364,8 +370,6 @@ if __name__ == "__main__":
     hypotheses = {
         "Baseline (no crash, no breakdown, no disturbance)": (0, 0, 0),
         "Crash only": (1, 0, 0),
-        #"Crash + Breakdown": (1, 1, 0), # too unrealistic
-        #"Crash + Breakdown + Disturbance": (1, 1, 1), # too unrealistic
         "Breakdown only": (0, 1, 0),
         "Disturbance only": (0, 0, 1)
     }
