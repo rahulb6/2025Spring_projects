@@ -74,7 +74,9 @@ def fabrication():
     """
     This function is meant to return the total time it takes to fabricate the spare part(s)
     :return: floating value representing part's fabrication time - random each time.
-    TODO: doctests
+    >>> time = fabrication()
+    >>> 12 <= time <= 36
+    True
     """
     fabrication_time = pert_sample(12, 18, 36)
     return fabrication_time
