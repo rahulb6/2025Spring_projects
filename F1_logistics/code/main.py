@@ -107,15 +107,15 @@ def valid_tracks():
     >>> track_A_date = result[1]
     >>> track_B_date = result[4]
 
-    >>> track_A_name == circuit_dict[track_A_name]
+    >>> # Check that track_B is the next race after track_A in circuit_dict order
+    >>> circuit_names = list(circuit_dict.keys())
+    >>> index_A = circuit_names.index(track_A_name)
+    >>> circuit_names[index_A + 1] == track_B_name
     True
 
-    >>> track_B_name == circuit_dict[track_B_name]
-    True
-
+    >>> # Validate race dates match what's in the dictionary
     >>> track_A_date == circuit_dict[track_A_name]['RaceDate']
     True
-
     >>> track_B_date == circuit_dict[track_B_name]['RaceDate']
     True
     """
@@ -141,11 +141,22 @@ def transport_time(loc_A, loc_B, mode):
     :param mode: air or road
     :return: time in hours (float)
 
-    >>> result = transport_time("locA", "locB", "road")
+    >>> time = transport_time("Hungaroring", "Circuit Zandvoort", "road") # both race tracks are in Europe
+    >>> isinstance(time, float)
     True
-    >>> result = transport_time("locA", "locB", "air")
+
+    >>> 5 <= time <= 20  # Hungaroring to Zandvoort by truck should fall in this range
     True
-    >>> transport_time("locA", "locB", "helicopter")
+
+    >>> time_hq = transport_time("HQ", "Circuit Zandvoort", "air")
+    >>> time_track = transport_time("Hungaroring", "Circuit Zandvoort", "road")
+    >>> time_hq > time_track  # HQ to Zandvoort via air takes lesser time, because airways transport is quicker
+    False
+
+    >>> transport_time("Circuit de Monaco", "Circuit de Barcelona-Catalunya", "boat")  # Invalid mode
+    Traceback (most recent call last):
+    ...
+    ValueError: Unsupported mode: use 'road' or 'air'.
     """
     # HQ coordinates (Milton Keynes)
     hq_lat, hq_lon = 52.0406, -0.7594
