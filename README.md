@@ -33,4 +33,4 @@ Randomized Variables (with PERT distributions):
   * Breakdown duration
   * Disturbance duration and severity multiplier
 
-We chose **PERT distributions** for randomization because they allow modeling of uncertainty using **best-case, most-likely, and worst-case** estimates — which we feel is a good fit for logistics scenarios. It also allowed for those values we werent able to find, such as the fabrication time for various parts. The facility to define a range of values and cause the randomization to skew towards the most likely value, and stay within the worst case and worst case values made PERT both intuitive and interpretable.
+We chose **PERT distributions** for randomization because they allow modeling of uncertainty using **best-case, most-likely, and worst-case** estimates — which we feel is a good fit for logistics scenarios. It also allowed for those values we weren't able to find, such as the fabrication time for various parts. The facility to define a range of values and cause the randomization to skew towards the most likely value, and stay within the worst case and worst case values made PERT both intuitive and interpretable.
