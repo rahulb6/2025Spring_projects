@@ -11,7 +11,6 @@ Be sure to check out the map.py too!
 Here is how we've designed the RedBull's logistics (Imagine you are the team's Logistics and Risk manager):
 - We will prefer roadways transportation through custom trucks if the next race destination is in the same continent
 and if the distance between the locations is less than 4000Km; airways in any other case.
--
 
 TODO: include a suppress_output mode
 """
@@ -35,6 +34,8 @@ def pert_sample(best_case, most_likely, worst_case):
     >>> ans=pert_sample(10,20,30)
     >>> 10 <= ans <= 30
     True
+    >>> type(ans)
+    <class 'float'>
 
     >>> ans = pert_sample(200.456,557,909.321)
     >>> 200.456 <= ans <= 909.321
@@ -47,12 +48,13 @@ def pert_sample(best_case, most_likely, worst_case):
     alpha = 4 * (most_likely - best_case) / (worst_case - best_case) + 1
     beta = 4 * (worst_case - most_likely) / (worst_case - best_case) + 1
 
-    sample = random.betavariate(alpha, beta)
+    sample = random.betavariate(alpha, beta)  # returns float
     return best_case + sample * (worst_case-best_case)
 
 def calculate_distance(lat1, lon1, lat2, lon2) -> float:
     """
     This function takes inputs of coordinates(lat-long) and computes the great-circle distance between.
+    The expected distance between 2 coordinates were coded using https://www.calculator.net/distance-calculator.html?la1=-37.8497&lo1=144.968&la2=31.3389&lo2=121.2189&lad1=38&lam1=53&las1=51.36&lau1=n&lod1=77&lom1=2&los1=11.76&lou1=w&lad2=39&lam2=56&las2=58.56&lau2=n&lod2=75&lom2=9&los2=1.08&lou2=w&type=3&ctype=dec&x=Calculate#latlog
     :param lat1: Race location A latitude
     :param lon1: Race location A longitude
     :param lat2: Race location B latitude
@@ -65,6 +67,8 @@ def calculate_distance(lat1, lon1, lat2, lon2) -> float:
     >>> round(calculate_distance(31.3389, 121.2189, 34.8431, 136.5419), 1)  # Shanghai → Suzuka
     1480.6
 
+    >>> round(calculate_distance(25.4892, 51.4531, 24.4672, 54.6031), 2) #lusail -> yas marina
+    337.58
     """
     distance_meters = Geodesic.WGS84.Inverse(lat1, lon1, lat2, lon2)['s12']
     distance_km = distance_meters / 1000
@@ -75,8 +79,15 @@ def fabrication():
     This function is meant to return the total time it takes to fabricate the spare part(s)
     :return: floating value representing part's fabrication time - random each time.
     >>> time = fabrication()
+    >>> isinstance(time, float)
+    True
     >>> 12 <= time <= 36
     True
+
+    >>> fabrication(10, 12, 36)
+    Traceback (most recent call last):
+    ...
+    TypeError: fabrication() takes 0 positional arguments but 3 were given # because it does not take parameters
     """
     fabrication_time = pert_sample(12, 18, 36)
     return fabrication_time
@@ -85,8 +96,27 @@ def valid_tracks():
     """
     This function is mean to pick random consecutive tracks from the dictionary - random each time
     :return: track_A and track_B's name, raceDate, Continent
+
     >>> result = valid_tracks()
-    >>> isinstance(result, tuple) and len(result) == 6
+    >>> isinstance(result, tuple) and len(result) == 6 # it returns 6 items
+    True
+
+    >>> result = valid_tracks()
+    >>> track_A_name = result[0]
+    >>> track_B_name = result[3]
+    >>> track_A_date = result[1]
+    >>> track_B_date = result[4]
+
+    >>> track_A_name == circuit_dict[track_A_name]
+    True
+
+    >>> track_B_name == circuit_dict[track_B_name]
+    True
+
+    >>> track_A_date == circuit_dict[track_A_name]['RaceDate']
+    True
+
+    >>> track_B_date == circuit_dict[track_B_name]['RaceDate']
     True
     """
     circuit_names = list(circuit_dict.keys())

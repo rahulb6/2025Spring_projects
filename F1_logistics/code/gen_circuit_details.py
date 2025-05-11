@@ -31,6 +31,7 @@ circuits = [
     ("Yas Marina Circuit", 24.4672, 54.6031, "Asia", "2025-12-08")
 ]
 
+
 # Initialize circuit dictionary
 circuit_dict = {}
 
