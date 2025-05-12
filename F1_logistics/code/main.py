@@ -311,7 +311,7 @@ def simulate_breakdown(track_A, track_B, mode, verbose=False):
     return round(total_time, 2)
 
 
-def simulate_disturbance(track_A, track_B, mode, verbose=False):
+def simulate_disturbance(track_A, track_B, mode, verbose=True):
     """
     Simulates if a disturbance occurs (customs delay, security delay, weather).
     Adds disturbance delay on top of normal transport time.
@@ -337,19 +337,59 @@ def simulate_disturbance(track_A, track_B, mode, verbose=False):
     >>> isinstance(t, float)
     True
     """
+    race_cancellation_flag = False
+    severity = pert_sample(0.1, 0.2, 1.1)  # Severity multiplier
+    if severity == 1.1:
+        if verbose:
+            print("Race cancelled due to extreme disturbance.")
+            race_cancellation_flag = True
+        track_B, mode = race_cancellation_simulator(track_A)
+
     # Base transport time
     base_transport_time = transport_time(track_A, track_B, mode)
+    # Duration of disturbance in hours
+    duration = pert_sample(2, 6, 48)
 
-    duration = pert_sample(2, 6, 48)  # Duration of disturbance in hours
     severity = pert_sample(0.1, 0.2, 1)  # Severity multiplier
     disturbance_delay = duration * severity
 
     total_time = base_transport_time + disturbance_delay
 
-    print(f"Disturbance occurred during transport ({mode.upper()})!")
-    print(f"Duration: {duration:.2f} hrs, Severity: {severity:.2f}, Extra delay: {disturbance_delay:.2f} hrs")
+    if verbose:
+        print(f"Disturbance occurred during transport ({mode.upper()})!")
+        print(f"Duration: {duration:.2f} hrs, Severity: {severity:.2f}, Extra delay: {disturbance_delay:.2f} hrs")
 
-    return round(total_time, 2)
+    return round(total_time, 2), race_cancellation_flag
+
+
+def race_cancellation_simulator(track_A):
+    """
+    If race at track_B is cancelled, this finds track_C (track_A + 2) and determines transport mode.
+    """
+    circuit_names = list(circuit_dict.keys())
+    index = circuit_names.index(track_A)
+
+    # handle edge case if track_A is second-last or last
+    if index + 2 >= len(circuit_names):
+        raise IndexError("Not enough races left in the calendar to skip to track C.")
+
+    track_C = circuit_names[index + 2]
+    cont_A = circuit_dict[track_A]['Continent']
+    cont_C = circuit_dict[track_C]['Continent']
+
+    lat_A = circuit_dict[track_A]['Latitude']
+    lon_A = circuit_dict[track_A]['Longitude']
+    lat_C = circuit_dict[track_C]['Latitude']
+    lon_C = circuit_dict[track_C]['Longitude']
+
+    dist = calculate_distance(lat_A, lon_A, lat_C, lon_C)
+
+    if cont_A == cont_C and dist <= 4000:
+        mode = "road"
+    else:
+        mode = "air"
+    return track_C, mode # will be received as track_B
+
 #---------------------------------------THE SIMULATOR that calls other simulators---------------------------------------
 def simulator(crash, breakdown, disturbance, verbose=False):
     """
@@ -361,7 +401,6 @@ def simulator(crash, breakdown, disturbance, verbose=False):
 
     :return: float. Total time (in hours) taken for transport including base time and any applicable delays.
     """
-
     # Get tracks and their information
     (track_A, track_A_date, track_A_continent,
      track_B, track_B_date, track_B_continent) = valid_tracks()
@@ -420,7 +459,9 @@ def simulator(crash, breakdown, disturbance, verbose=False):
 
     elif crash == 0 and breakdown == 0 and disturbance == 1:
         # Disturbance case: trackA to trackB with disturbance delay
-        total_time = simulate_disturbance(track_A, track_B, mode)
+        total_time, race_cancellation_flag = simulate_disturbance(track_A, track_B, mode)
+        if race_cancellation_flag:
+            max_allowed_hours = 65
         #print(f"Total time after disturbance scenario: {total_time} hrs")
     """
     elif crash == 1 and breakdown == 1 and disturbance == 0:
