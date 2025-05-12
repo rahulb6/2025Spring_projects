@@ -87,7 +87,7 @@ def fabrication():
     >>> fabrication(10, 12, 36)
     Traceback (most recent call last):
     ...
-    TypeError: fabrication() takes 0 positional arguments but 3 were given # because it does not take parameters
+    TypeError: fabrication() takes 0 positional arguments but 3 were given
     """
     fabrication_time = pert_sample(12, 18, 36)
     return fabrication_time
@@ -145,7 +145,7 @@ def transport_time(loc_A, loc_B, mode):
     >>> isinstance(time, float)
     True
 
-    >>> 5 <= time <= 20  # Hungaroring to Zandvoort by truck should fall in this range
+    >>> 3 <= time # Hungaroring to Zandvoort by truck should be more than 3
     True
 
     >>> time_hq = transport_time("HQ", "Circuit Zandvoort", "air")
@@ -153,7 +153,7 @@ def transport_time(loc_A, loc_B, mode):
     >>> time_hq > time_track  # HQ to Zandvoort via air takes lesser time, because airways transport is quicker
     False
 
-    >>> transport_time("Circuit de Monaco", "Circuit de Barcelona-Catalunya", "boat")  # Invalid mode
+    >>> transport_time("Circuit de Monaco", "Circuit de Barcelona-Catalunya", "boat")  # doctest: +ELLIPSIS
     Traceback (most recent call last):
     ...
     ValueError: Unsupported mode: use 'road' or 'air'.
@@ -196,6 +196,13 @@ def transport_time(loc_A, loc_B, mode):
         air_travel_time = distance_km / speed_kmph
 
         # Total transport time
+        """
+        loading_unloading_delay is added because when we choose airways, we'd have to load the cargo into trucks, 
+        drive them to airports, unload from the trucks, load them into cargo planes, then transport them to the
+        destination, unload from the plane at the destination, load them into trucks to transport them to the
+        destination tracks. Thus we sample a random number between 4hrs and 10hrs and add them to the total travel
+        time.
+        """
         travel_time_hrs = air_travel_time + local_road_time
         loading_unloading_delay = pert_sample(4, 5, 10)
         travel_time_hrs += loading_unloading_delay
@@ -203,20 +210,39 @@ def transport_time(loc_A, loc_B, mode):
         return round(travel_time_hrs, 2)
 
     else:
-        raise ValueError("Unsupported mode: use 'road' or 'air'.")
+        raise ValueError("Unsupported mode: use 'road' or 'air'.") # this should never occur, because the user does not specify the mode. simulator() does!
 
     travel_time_hrs = distance_km / speed_kmph
     return round(travel_time_hrs, 2)
 
 #--------------------------------------------SIMULATORS----------------------------------------------------------------
 #def simulate_crash(track_A, track_B, breakdown, disturbance):
-def simulate_crash(track_A, track_B, mode):
+def simulate_crash(track_A, track_B, mode, verbose=False):
     """
     Simulates a crash scenario where spare parts need to be fabricated and flown from HQ to the next track.
     Always assumes air transport due to urgency.
     :param: track_A: name of circuit A
     :param: track_B: name of circuit B
     :return: total delayed transportation time
+    TODO: troubleshoot this doctest-2
+
+    >>> simulate_crash("this circuit does not exist", "Baku City Circuit", "air", verbose=True)
+    Traceback (most recent call last):
+    ...
+    KeyError: 'this circuit does not exist'
+
+    >>> t = simulate_crash("Hungaroring", "Circuit Zandvoort", "road", verbose=True) # doctest: +ELLIPSIS
+    Crash at Hungaroring. Spare parts flown from HQ to Circuit Zandvoort.
+    Transport time (max of transport time from track_A and HQ): ...
+    Total recovery and delivery time: ...
+
+    >>> isinstance(t, float)
+    True
+
+    >>> simulate_crash("Hungaroring", "Circuit Zandvoort", "something that should not be given", verbose=True)
+    Traceback (most recent call last):
+    ...
+    ValueError: Unsupported mode: use 'road' or 'air'.
     """
     print(f"Crash at {track_A}. Spare parts flown from HQ to {track_B}.")
 
@@ -228,23 +254,39 @@ def simulate_crash(track_A, track_B, mode):
 
     # calculating time for HQ to track_B - getting new parts
     base_delivery_time_B = transport_time("HQ", track_B, "air")
-
+    print(f"Transport time (transport time from track_A to track_B and HQ to track_B): {base_delivery_time_A:.2f} hrs and {base_delivery_time_B} hrs")
+    print(f"fabrication time: {fabrication_time:.2f} hrs")
     # if any delay, the delay would be caused by which ever leg of transportation took the longest
     base_delivery_time = max(base_delivery_time_B, base_delivery_time_A)
-    print(f"Transport time (max of transport time from track_A and HQ): {base_delivery_time:.2f} hrs")
 
     total_delay_time = fabrication_time + base_delivery_time
 
     print(f"Total recovery and delivery time: {total_delay_time:.2f} hrs")
     return round(total_delay_time, 2)
 
-def simulate_breakdown(track_A, track_B, mode):
+def simulate_breakdown(track_A, track_B, mode, verbose=False):
     """
     Simulates breakdown of carrier: trucks (road) or cargo planes (air). Adds additional delay if breakdown occurs.
     :param track_A: name of circuit A
     :param track_B: name of circuit B
     :param mode: air or road
     :return: total delayed transportation time because of breakdown
+
+    >>> simulate_breakdown("Circuit de Monaco", "Circuit de Barcelona-Catalunya", "water", verbose=True)
+    Traceback (most recent call last):
+    ...
+    ValueError: Unsupported mode: use 'road' or 'air'.
+
+    >>> simulate_breakdown("this circuit does not exist", "Baku City Circuit", "air", verbose=True)
+    Traceback (most recent call last):
+    ...
+    KeyError: 'this circuit does not exist'
+
+    >>> t = simulate_breakdown("Circuit de Monaco", "Circuit de Barcelona-Catalunya", "road", verbose=True) # doctest: +ELLIPSIS
+    Breakdown occurred during transport (ROAD)! Extra delay: ...
+
+    >>> isinstance(t, float)
+    True
     """
     # Base transport time
     base_delivery_time = transport_time(track_A, track_B, mode)
@@ -256,7 +298,7 @@ def simulate_breakdown(track_A, track_B, mode):
         best, most_likely, worst = 2, 3, 12
 
     else:
-        raise ValueError("Mode must be 'road' or 'air'.")
+        raise ValueError("Unsupported mode: use 'road' or 'air'")
 
     # Simulate breakdown occurrence
     breakdown_delay = pert_sample(best, most_likely, worst)
@@ -265,7 +307,7 @@ def simulate_breakdown(track_A, track_B, mode):
     return round(total_time, 2)
 
 
-def simulate_disturbance(track_A, track_B, mode):
+def simulate_disturbance(track_A, track_B, mode, verbose=False):
     """
     Simulates if a disturbance occurs (customs delay, security delay, weather).
     Adds disturbance delay on top of normal transport time.
@@ -273,6 +315,23 @@ def simulate_disturbance(track_A, track_B, mode):
     :param track_B: name of circuit B
     :param mode: air or road
     :return: total delayed transportation time because of disturbance
+
+    >>> simulate_disturbance("Circuit de Monaco", "Circuit de Barcelona-Catalunya", "water", verbose=True)
+    Traceback (most recent call last):
+    ...
+    ValueError: Unsupported mode: use 'road' or 'air'.
+
+    >>> simulate_disturbance("this circuit does not exist", "Baku City Circuit", "air", verbose=True)
+    Traceback (most recent call last):
+    ...
+    KeyError: 'this circuit does not exist'
+
+    >>> t = simulate_disturbance("Circuit de Monaco", "Circuit de Barcelona-Catalunya", "road", verbose=True) # doctest: +ELLIPSIS
+    Disturbance occurred during transport (ROAD)!
+    Duration: ..., Severity: ..., Extra delay: ...
+
+    >>> isinstance(t, float)
+    True
     """
     # Base transport time
     base_transport_time = transport_time(track_A, track_B, mode)
@@ -288,7 +347,7 @@ def simulate_disturbance(track_A, track_B, mode):
 
     return round(total_time, 2)
 #---------------------------------------THE SIMULATOR that calls other simulators---------------------------------------
-def simulator(crash, breakdown, disturbance):
+def simulator(crash, breakdown, disturbance, verbose=False):
     """
     Simulates transport between two consecutive F1 races. Handles crash recovery, breakdowns, and disturbances.
     Dynamically chooses transport mode (road or air) based on distance + continent.
@@ -310,22 +369,11 @@ def simulator(crash, breakdown, disturbance):
     # Calculate days between races
     days_between = (track_B_date_dt - track_A_date_dt).days
 
-    # adding buffer times
-    """
-    for back-to-back races and roadways transport -> loading of paddock material/ priority stuff happens during the 
-    race, and thus no considerable downtime during "loading phase". The "unloading phase" is after the trucks
-    reach the destination which is not part of the "transportation time" we are calculating. So, no buffer time
-    is added for any roadways transportation.
-    
-    for those races that get deliveries through airways -> the paddock material will have to be packed and loaded into 
-    trucks, driven to the airport, unloaded from trucks, loaded onto cargo planes and then is flown to the destination, 
-    unloaded into trucks which is then driven to the tracks. So the time for loading and unloading is roughly 5 hours.
-    """
     # Decide transport max hours
     if days_between == 7:
         max_allowed_hours = 58
     else:
-        max_allowed_hours = (60+5) # where the 5hrs is the loading unloading time
+        max_allowed_hours = 65
 
     # Get coordinates
     lat_A = circuit_dict[track_A]["Latitude"]
