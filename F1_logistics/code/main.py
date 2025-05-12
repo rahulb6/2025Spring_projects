@@ -339,11 +339,13 @@ def simulate_disturbance(track_A, track_B, mode, verbose=True):
     """
     race_cancellation_flag = False
     severity = pert_sample(0.1, 0.2, 1.1)  # Severity multiplier
-    if severity == 1.1:
+    if severity > 1:
         if verbose:
-            print("Race cancelled due to extreme disturbance.")
+            print(f"Race at {track_B} cancelled due to extreme disturbance.")
             race_cancellation_flag = True
         track_B, mode = race_cancellation_simulator(track_A)
+        if verbose:
+            print(f"Transporting to {track_B} now.")
 
     # Base transport time
     base_transport_time = transport_time(track_A, track_B, mode)
