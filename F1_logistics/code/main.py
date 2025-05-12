@@ -12,11 +12,9 @@ Here is how we've designed the RedBull's logistics (Imagine you are the team's L
 - We will prefer roadways transportation through custom trucks if the next race destination is in the same continent
 and if the distance between the locations is less than 4000Km; airways in any other case.
 
-TODO: include a suppress_output mode
 TODO: combination hypothesis
 TODO: configure
 TODO: expand results
-TODO: race cancellations
 TODO: API and cache circuit_dict
 TODO: document
 """
@@ -249,7 +247,8 @@ def simulate_crash(track_A, track_B, mode, verbose=False):
     ...
     ValueError: Unsupported mode: use 'road' or 'air'.
     """
-    print(f"Crash at {track_A}. Spare parts flown from HQ to {track_B}.")
+    if verbose:
+        print(f"Crash at {track_A}. Spare parts flown from HQ to {track_B}.")
 
     # Fabrication time
     fabrication_time = fabrication()  # Returns random fabrication time each time
@@ -260,12 +259,14 @@ def simulate_crash(track_A, track_B, mode, verbose=False):
     # calculating time for HQ to track_B - getting new parts
     base_delivery_time_B = transport_time("HQ", track_B, "air")
     base_delivery_time_B += fabrication_time
-    print(f"Transport time (transport time from [track_A to track_B] and [HQ to track_B incl fabrication]): {base_delivery_time_A:.2f} hrs and {base_delivery_time_B:.2f} hrs")
+    if verbose:
+        print(f"Transport time (transport time from [track_A to track_B] and [HQ to track_B incl fabrication]): {base_delivery_time_A:.2f} hrs and {base_delivery_time_B:.2f} hrs")
 
     # if any delay, the delay would be caused by which ever leg of transportation took the longest
     total_delay_time = max(base_delivery_time_B, base_delivery_time_A)
 
-    print(f"Total recovery and delivery time: {total_delay_time:.2f} hrs")
+    if verbose:
+        print(f"Total recovery and delivery time: {total_delay_time:.2f} hrs")
     return round(total_delay_time, 2)
 
 def simulate_breakdown(track_A, track_B, mode, verbose=False):
@@ -306,12 +307,13 @@ def simulate_breakdown(track_A, track_B, mode, verbose=False):
 
     # Simulate breakdown occurrence
     breakdown_delay = pert_sample(best, most_likely, worst)
-    print(f"Breakdown occurred during transport ({mode.upper()})! Extra delay: {breakdown_delay:.2f} hrs")
+    if verbose:
+        print(f"Breakdown occurred during transport ({mode.upper()})! Extra delay: {breakdown_delay:.2f} hrs")
     total_time = base_delivery_time + breakdown_delay
     return round(total_time, 2)
 
 
-def simulate_disturbance(track_A, track_B, mode, verbose=True):
+def simulate_disturbance(track_A, track_B, mode, verbose=False):
     """
     Simulates if a disturbance occurs (customs delay, security delay, weather).
     Adds disturbance delay on top of normal transport time.
@@ -435,45 +437,42 @@ def simulator(crash, breakdown, disturbance, verbose=False):
     else:
         mode = "air"
 
-    print(f"\n--- Simulation for {track_A} → {track_B} ---")
-    print(f"Race A date: {track_A_date} ({track_A_continent})")
-    print(f"Race B date: {track_B_date} ({track_B_continent})")
-    print(f"Days between races: {days_between}")
-    print(f"Distance between tracks: {distance_km:.2f} km")
-    print(f"Transport mode decided: {mode.upper()}")
-    print(f"Max allowed hours: {max_allowed_hours}")
+    if verbose:
+        print(f"\n--- Simulation for {track_A} → {track_B} ---")
+        print(f"Race A date: {track_A_date} ({track_A_continent})")
+        print(f"Race B date: {track_B_date} ({track_B_continent})")
+        print(f"Days between races: {days_between}")
+        print(f"Distance between tracks: {distance_km:.2f} km")
+        print(f"Transport mode decided: {mode.upper()}")
+        print(f"Max allowed hours: {max_allowed_hours}")
 
     # Now simulate based on hypothesis
     if crash == 0 and breakdown == 0 and disturbance == 0:
         # Pure baseline transport
         total_time = transport_time(track_A, track_B, mode)
-        #print(f"Transport time (no crash, no breakdown, no disturbance): {total_time} hrs")
 
     elif crash == 1 and breakdown == 0 and disturbance == 0:
         # Crash case: fabrication + HQ-to-trackB transport + optional delays
         total_time = simulate_crash(track_A, track_B, mode)
-        #print(f"Total time after crash scenario: {total_time} hrs")
 
     elif crash == 0 and breakdown == 1 and disturbance == 0:
         # Breakdown case: trackA to trackB with breakdown delay
         total_time = simulate_breakdown(track_A, track_B, mode)
-        #print(f"Total time after breakdown scenario: {total_time} hrs")
 
     elif crash == 0 and breakdown == 0 and disturbance == 1:
         # Disturbance case: trackA to trackB with disturbance delay
         total_time, race_cancellation_flag = simulate_disturbance(track_A, track_B, mode)
         if race_cancellation_flag:
             max_allowed_hours = 65
-        #print(f"Total time after disturbance scenario: {total_time} hrs")
     """
     elif crash == 1 and breakdown == 1 and disturbance == 0:
         total_time = max(simulate_crash(track_A, track_B, mode), simulate_breakdown(track_A, track_B, mode))
     """
     # Final check against allowed max hours
     if total_time <= max_allowed_hours:
-        print("Transport fits within allowed time limit.")
+        verbose and print("Transport fits within allowed time limit.")
     else:
-        print("Transport exceeds allowed time limit.")
+        verbose and print("Transport exceeds allowed time limit.")
 
     return total_time
 
