@@ -254,12 +254,11 @@ def simulate_crash(track_A, track_B, mode, verbose=False):
 
     # calculating time for HQ to track_B - getting new parts
     base_delivery_time_B = transport_time("HQ", track_B, "air")
-    print(f"Transport time (transport time from track_A to track_B and HQ to track_B): {base_delivery_time_A:.2f} hrs and {base_delivery_time_B} hrs")
-    print(f"fabrication time: {fabrication_time:.2f} hrs")
-    # if any delay, the delay would be caused by which ever leg of transportation took the longest
-    base_delivery_time = max(base_delivery_time_B, base_delivery_time_A)
+    base_delivery_time_B += fabrication_time
+    print(f"Transport time (transport time from [track_A to track_B] and [HQ to track_B incl fabrication]): {base_delivery_time_A:.2f} hrs and {base_delivery_time_B} hrs")
 
-    total_delay_time = fabrication_time + base_delivery_time
+    # if any delay, the delay would be caused by which ever leg of transportation took the longest
+    total_delay_time = max(base_delivery_time_B, base_delivery_time_A)
 
     print(f"Total recovery and delivery time: {total_delay_time:.2f} hrs")
     return round(total_delay_time, 2)
@@ -402,22 +401,22 @@ def simulator(crash, breakdown, disturbance, verbose=False):
     if crash == 0 and breakdown == 0 and disturbance == 0:
         # Pure baseline transport
         total_time = transport_time(track_A, track_B, mode)
-        print(f"Transport time (no crash, no breakdown, no disturbance): {total_time} hrs")
+        #print(f"Transport time (no crash, no breakdown, no disturbance): {total_time} hrs")
 
     elif crash == 1 and breakdown == 0 and disturbance == 0:
         # Crash case: fabrication + HQ-to-trackB transport + optional delays
         total_time = simulate_crash(track_A, track_B, mode)
-        print(f"Total time after crash scenario: {total_time} hrs")
+        #print(f"Total time after crash scenario: {total_time} hrs")
 
     elif crash == 0 and breakdown == 1 and disturbance == 0:
         # Breakdown case: trackA to trackB with breakdown delay
         total_time = simulate_breakdown(track_A, track_B, mode)
-        print(f"Total time after breakdown scenario: {total_time} hrs")
+        #print(f"Total time after breakdown scenario: {total_time} hrs")
 
     elif crash == 0 and breakdown == 0 and disturbance == 1:
         # Disturbance case: trackA to trackB with disturbance delay
         total_time = simulate_disturbance(track_A, track_B, mode)
-        print(f"Total time after disturbance scenario: {total_time} hrs")
+        #print(f"Total time after disturbance scenario: {total_time} hrs")
 
     # Final check against allowed max hours
     if total_time <= max_allowed_hours:
