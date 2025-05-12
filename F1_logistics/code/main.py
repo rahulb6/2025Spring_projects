@@ -13,6 +13,12 @@ Here is how we've designed the RedBull's logistics (Imagine you are the team's L
 and if the distance between the locations is less than 4000Km; airways in any other case.
 
 TODO: include a suppress_output mode
+TODO: combination hypothesis
+TODO: configure
+TODO: expand results
+TODO: race cancellations
+TODO: API and cache circuit_dict
+TODO: document
 """
 import random
 import matplotlib.pyplot as plt
@@ -224,7 +230,6 @@ def simulate_crash(track_A, track_B, mode, verbose=False):
     :param: track_A: name of circuit A
     :param: track_B: name of circuit B
     :return: total delayed transportation time
-    TODO: troubleshoot this doctest-2
 
     >>> simulate_crash("this circuit does not exist", "Baku City Circuit", "air", verbose=True)
     Traceback (most recent call last):
@@ -417,7 +422,10 @@ def simulator(crash, breakdown, disturbance, verbose=False):
         # Disturbance case: trackA to trackB with disturbance delay
         total_time = simulate_disturbance(track_A, track_B, mode)
         #print(f"Total time after disturbance scenario: {total_time} hrs")
-
+    """
+    elif crash == 1 and breakdown == 1 and disturbance == 0:
+        total_time = max(simulate_crash(track_A, track_B, mode), simulate_breakdown(track_A, track_B, mode))
+    """
     # Final check against allowed max hours
     if total_time <= max_allowed_hours:
         print("Transport fits within allowed time limit.")
@@ -483,7 +491,8 @@ if __name__ == "__main__":
         "Baseline (no crash, no breakdown, no disturbance)": (0, 0, 0),
         "Crash only": (1, 0, 0),
         "Breakdown only": (0, 1, 0),
-        "Disturbance only": (0, 0, 1)
+        "Disturbance only": (0, 0, 1),
+        #"Crash+Breakdown": (1, 1, 0)
     }
 
     for hypo_name, params in hypotheses.items():
