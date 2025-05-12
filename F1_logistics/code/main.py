@@ -233,7 +233,7 @@ def simulate_crash(track_A, track_B, mode, verbose=False):
 
     >>> t = simulate_crash("Hungaroring", "Circuit Zandvoort", "road", verbose=True) # doctest: +ELLIPSIS
     Crash at Hungaroring. Spare parts flown from HQ to Circuit Zandvoort.
-    Transport time (max of transport time from track_A and HQ): ...
+    Transport time (transport time from [track_A to track_B] and [HQ to track_B incl fabrication]): ...
     Total recovery and delivery time: ...
 
     >>> isinstance(t, float)
@@ -255,7 +255,7 @@ def simulate_crash(track_A, track_B, mode, verbose=False):
     # calculating time for HQ to track_B - getting new parts
     base_delivery_time_B = transport_time("HQ", track_B, "air")
     base_delivery_time_B += fabrication_time
-    print(f"Transport time (transport time from [track_A to track_B] and [HQ to track_B incl fabrication]): {base_delivery_time_A:.2f} hrs and {base_delivery_time_B} hrs")
+    print(f"Transport time (transport time from [track_A to track_B] and [HQ to track_B incl fabrication]): {base_delivery_time_A:.2f} hrs and {base_delivery_time_B:.2f} hrs")
 
     # if any delay, the delay would be caused by which ever leg of transportation took the longest
     total_delay_time = max(base_delivery_time_B, base_delivery_time_A)
