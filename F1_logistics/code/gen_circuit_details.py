@@ -1,8 +1,5 @@
 from geographiclib.geodesic import Geodesic
 
-# Red Bull HQ Coordinates
-hq_lat, hq_lon = 52.0406, -0.7594
-
 # Updated Circuits List (Name, Latitude, Longitude, Continent, RaceDate)
 circuits = [
     ("Melbourne Grand Prix Circuit", -37.8497, 144.968, "Oceania", "2025-03-16"),
@@ -36,21 +33,11 @@ circuits = [
 circuit_dict = {}
 
 for i, (name, lat, lon, continent, race_date) in enumerate(circuits):
-    if i == 0:
-        distance_prev = 0
-    else:
-        prev_lat, prev_lon = circuits[i-1][1], circuits[i-1][2]
-        distance_prev = Geodesic.WGS84.Inverse(prev_lat, prev_lon, lat, lon)['s12']
-
-    distance_hq = Geodesic.WGS84.Inverse(hq_lat, hq_lon, lat, lon)['s12']
-
     circuit_dict[name] = {
         "Latitude": lat,
         "Longitude": lon,
         "Continent": continent,
-        "RaceDate": race_date,
-        "Distance_From_Previous_meters": distance_prev,
-        "Distance_From_HQ_meters": distance_hq
+        "RaceDate": race_date
     }
 
 if __name__ == "__main__":

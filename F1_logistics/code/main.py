@@ -17,6 +17,7 @@ TODO: configure
 TODO: expand results
 TODO: API and cache circuit_dict
 TODO: document
+TODO: retest all DOCTESTS
 """
 import random
 import matplotlib.pyplot as plt
