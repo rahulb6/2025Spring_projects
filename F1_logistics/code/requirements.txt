@@ -1,4 +1,4 @@
-
+python >=3.8
 matplotlib==3.8.0
 numpy==1.26.4
 geographiclib==2.0
