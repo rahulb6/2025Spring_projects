@@ -8,9 +8,6 @@ To understand the stakes of logistics :
 3. https://www.youtube.com/watch?v=m8p3vRsXz1k
 Be sure to check out the map.py too!
 
-Here is how we've designed the RedBull's logistics (Imagine you are the team's Logistics and Risk manager):
-- We will prefer roadways transportation through custom trucks if the next race destination is in the same continent
-and if the distance between the locations is less than 4000Km; airways in any other case.
 
 TODO: combination hypothesis
 TODO: configure?
@@ -25,6 +22,17 @@ from geographiclib.geodesic import Geodesic
 import numpy as np
 from gen_circuit_details import circuit_dict as circuit_dict # another .py in github
 from datetime import datetime
+import yaml
+
+with open("config.yaml", "r") as file:
+    config = yaml.safe_load(file)
+
+hq_lat = config['hq_coordinates']['latitude']
+hq_lon = config['hq_coordinates']['longitude']
+severity_threshold = config['severity_threshold']
+dist_threshold = config['distance_threshold_km']
+n_simulations = config['no_of_simulations']
+
 
 #-------------------------------------------------HELPER FNS-----------------------------------------------------------
 def pert_sample(best_case, most_likely, worst_case):
@@ -163,9 +171,6 @@ def transport_time(loc_A, loc_B, mode):
     ...
     ValueError: Unsupported mode: use 'road' or 'air'.
     """
-    # HQ coordinates (Milton Keynes)
-    hq_lat, hq_lon = 52.0406, -0.7594
-
     # Get coordinates for location A
     if loc_A == "HQ":
         lat_A, lon_A = hq_lat, hq_lon
@@ -340,7 +345,7 @@ def simulate_disturbance(track_A, track_B, mode, verbose=False):
     """
     race_cancellation_flag = False
     severity = pert_sample(0.1, 0.2, 1.1)  # Severity multiplier
-    if severity > 1:
+    if severity > severity_threshold:
         if verbose:
             print(f"Race at {track_B} cancelled due to extreme disturbance.")
             race_cancellation_flag = True
@@ -400,7 +405,7 @@ def race_cancellation_simulator(track_A):
 
     dist = calculate_distance(lat_A, lon_A, lat_C, lon_C)
 
-    if cont_A == cont_C and dist <= 4000:
+    if cont_A == cont_C and dist <= dist_threshold:
         mode = "road"
     else:
         mode = "air"
@@ -455,7 +460,7 @@ def simulator(crash, breakdown, disturbance, verbose=False):
     distance_km = calculate_distance(lat_A, lon_A, lat_B, lon_B)
 
     # Decide mode based on distance and continent
-    if track_A_continent == track_B_continent and distance_km <= 4000:
+    if track_A_continent == track_B_continent and distance_km <= dist_threshold:
         mode = "road"
     else:
         mode = "air"
@@ -555,9 +560,6 @@ def plot_histogram(results, hypothesis_name):
 
 if __name__ == "__main__":
     exceeding_cases = []
-
-    # Ask user for number of simulations
-    n_simulations = int(input("Enter the number of simulations to run per hypothesis: "))
 
     # Updated hypotheses — only focus on crash, breakdown, disturbance
     hypotheses = {
