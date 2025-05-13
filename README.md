@@ -35,8 +35,9 @@ Randomized Variables (with PERT distributions):
 
 We chose **PERT distributions** for randomization because they allow modeling of uncertainty using **best-case, most-likely, and worst-case** estimates — which we feel is a good fit for logistics scenarios. It also allowed for those values we weren't able to find, such as the fabrication time for various parts. The facility to define a range of values and cause the randomization to skew towards the most likely value, and stay within the worst case and worst case values made PERT both intuitive and interpretable.
 
-This system we have created for Redbull will consider 2 ways of transportation: roadways and airways. The transportation leg before the season begins, through waterways is out of the scope of this project. Our intention is to optimize transport during the race season itself. Once a race is over, looking at the date of the next race, it will decide if we have 58hours or 65 hours to transport the material. In case of double/ triple - headers, we will have 58 hours and when there is no race next week, we will have 65 hours. Then the simulator will choose between roadways and airways. If the next race is happening on the same continent as the previous race, and if the distance between the tracks is less than 4000km, then roadways is preferred, otherwise airways.
-
+This simulation system for Red Bull Racing focuses exclusively on in-season logistics, modeling transport between races via roadways and airways. While pre-season shipments, handled through waterways fall outside the scope of this project. The simulation initiates once a race concludes. Based on the date of the next race, the system calculates whether there is a tight turnaround window (58 hours) as in the case of double-headers or triple-headers, or a more flexible window (65 hours) when no race is scheduled the following weekend. 
+Next, the simulator evaluates transportation mode. If the next race is on the **same continent and the distance between tracks is under 4000 km**, road transport is preferred. Otherwise, the system defaults to air transport. This logic aligns with real-world F1 logistics practices, ensuring that the simulation mimics operational decisions made by logistics teams under time and distance constraints with sustainability in mind.
+------------
 Reasoning for the constraints: 
 1. Roadways - if the next race is in the same continent: Viable roadways is necessary to deliver the material. 
 2. 4000km - You may ask what if we have time to slowly make the delivery even across 6000km. It is possible to make the delivery through roadways by driving the trucks for 6000Km, but it would rather be inefficient. A big trademark of Formula One and the teams partnering with them is sustainability. It wouldn't be a good choice to drive trucks for such a long distance when another efficient choice is available. airways can make that delivery in a fraction of that time, more sustainable.
@@ -45,6 +46,28 @@ In case of the Crash Hypothesis, the delivery of the fabricated part from the he
 
 In case of the Breakdown Hypothesis, the mechanical failure in the trucks or the cargo plane will cause a delay.
 In case of Disturbance Hypothesis, a "severity" factor will first simulate the cancellation of the next race. If the next race is cancelled, then the material will be transported to the following race. This leg of delivery again experiences another disturbance of lesser severity. Note: the cancellation case might not occur in 500 iterations or may not happen even in 5000 iterations. Turn the verbose True for the simulate_disturbance() function and run it to see if it happens.
-
+------------------
 **VALIDATION PHASE**
-H₀: Baseline Scenario was executed and the 
+In the baseline scenario, where no crash, breakdown, or external disturbance occurred, the logistics system completed transportation in an average of 15.63 hours (note that this value may vary slightly with each run) across 500 simulations. Importantly, not a single run exceeded the assigned deadlines. This validates that the transport decision system - where roadways are preferred under specific conditions and airways otherwise - is effective and robust under normal operating circumstances, with a 100% success rate in meeting time constraints. The results of other hypotheses—such as crash recovery, breakdowns, or disturbances - will be assessed relative to this baseline, allowing us to quantify the additional time and risk introduced by each specific challenge (hypothesis) in the logistics design.
+
+**EXPERIMENT PHASE**
+Upon running the simulation for all hypothesis, these are the results and interpretations:
+(Note that there is no numbers mentioned here, because they might differ every time you run the program)
+
+1. Minimum Delivery Time Comparison: When analyzing the minimum delivery times across scenarios, we observe that both H2: Breakdown and H3: Disturbance cases yield delivery times that are close to the H0: Baseline scenario. However, in the case of a H1: Crash, the minimum delivery time is significantly higher. We believe,that this deviation is primarily attributed to the fabrication time required to replace damaged and depleted components, which inherently adds a delay even under the best conditions.
+2. Convergence Behavior (Mean Delivery Time): The mean delivery time or convergence point across simulations reinforces this pattern. While H2: Breakdowns and H3: Disturbances introduce minor delays—adding just a few hours over the H0: Baseline - the H1: Crash scenario results in a notably higher mean delivery time. This again highlights the impact of fabrication on the overall delivery duration.
+
+**REFERENCES:**
+To understand the stakes of logistics :
+1. https://www.youtube.com/watch?v=n6uWuL4_pDI
+2. https://www.youtube.com/watch?v=6OLVFa8YRfM
+3. https://www.youtube.com/watch?v=m8p3vRsXz1k
+Be sure to check out the map.py too!
+4. 2025 Race calendar: https://www.formula1.com/en/racing/2025
+5. PERT: https://real-statistics.com/binomial-and-related-distributions/pert-distribution/
+6. Geodesic s12: https://geographiclib.sourceforge.io/html/python/examples.html
+7. Article used to assume roadways speed range: https://dhl-freight-connections.com/en/business/truck-speed-limits-europe/
+8. Article used to assume roadways speed within city limits: https://www.bts.gov/browse-statistical-products-and-data/info-gallery/average-truck-speed-mph-bottleneck-locations
+9. Article used to assume cargo plane speeds: https://www.freightcourse.com/largest-cargo-planes/
+Other references:
+10. https://www.calculator.net/distance-calculator.html?la1=-37.8497&lo1=144.968&la2=31.3389&lo2=121.2189&lad1=38&lam1=53&las1=51.36&lau1=n&lod1=77&lom1=2&los1=11.76&lou1=w&lad2=39&lam2=56&las2=58.56&lau2=n&lod2=75&lom2=9&los2=1.08&lou2=w&type=3&ctype=dec&x=Calculate#latlog

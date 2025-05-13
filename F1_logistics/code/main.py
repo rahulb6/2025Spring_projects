@@ -1,12 +1,8 @@
 """
 IS597 Spring 2025 - Final Project
+14th May 2025
 F1 Logistics using Monte Carlo Simulation
-Author: Rahul Balasubramani(rahulb6) & Anushree Udhayakumar(au11)
-To understand the stakes of logistics :
-1. https://www.youtube.com/watch?v=n6uWuL4_pDI
-2. https://www.youtube.com/watch?v=6OLVFa8YRfM
-3. https://www.youtube.com/watch?v=m8p3vRsXz1k
-Be sure to check out the map.py too!
+Authors: Anushree Udhayakumar(au11) & Rahul Balasubramani(rahulb6)
 TODO: comments, documentation, citations
 """
 import random
@@ -183,6 +179,7 @@ def transport_time(loc_A, loc_B, mode):
         # https://dhl-freight-connections.com/en/business/truck-speed-limits-europe/
     elif mode == "air":
         speed_kmph = pert_sample(800, 700, 600) # Air speed (flight portion)
+        # https://www.freightcourse.com/largest-cargo-planes/
 
         # Local road speeds for track <-> airport connection
         # https://www.bts.gov/browse-statistical-products-and-data/info-gallery/average-truck-speed-mph-bottleneck-locations
