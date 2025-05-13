@@ -1,7 +1,0 @@
-hq_coordinates:
-  latitude: 52.0406
-  longitude: -0.7594
-
-severity_threshold: 1.0
-distance_threshold_km: 4000
-no_of_simulations: 500
