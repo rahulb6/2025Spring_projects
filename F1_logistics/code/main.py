@@ -7,14 +7,7 @@ To understand the stakes of logistics :
 2. https://www.youtube.com/watch?v=6OLVFa8YRfM
 3. https://www.youtube.com/watch?v=m8p3vRsXz1k
 Be sure to check out the map.py too!
-
-
-TODO: combination hypothesis
-TODO: configure?
-TODO: expand results?
-TODO: API and cache circuit_dict?
-TODO: document
-TODO: retest all DOCTESTS
+TODO: comments, documentation, citations
 """
 import random
 import matplotlib.pyplot as plt
