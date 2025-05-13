@@ -1,16 +1,3 @@
-F1 Logistics Simulation using Monte Carlo
-
-Project Overview:
-
-This project models the complex logistics of transporting F1 race equipment from one circuit to another using Monte Carlo simulation. Based on real F1 schedules and practical team constraints, the simulation predicts delivery delays under various risks such as vehicle breakdowns, disturbances, and crash-related part replacements.
-
-Authors
-- Rahul Balasubramani (rahulb6)
-- Anushree Udhayakumar (au11)
-University of Illinois Urbana-Champaign — IS597 Spring 2025 Final Project
-
-Code Files:
-
 `main.py`
 The main simulation script:
 - Decides transport mode (road or air) based on distance and continent.

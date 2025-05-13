@@ -248,12 +248,10 @@ def simulate_crash(track_A, track_B, mode, verbose=False):
     if verbose:
         print(f"Crash at {track_A}. Spare parts flown from HQ to {track_B}.")
 
-    # Fabrication time
-    fabrication_time = fabrication()  # Returns random fabrication time each time
-
     # calculating time for track_A to track_B - moving the non-damaged parts
     base_delivery_time_A = transport_time(track_A, track_B, mode)
-
+    # Fabrication time
+    fabrication_time = fabrication()  # Returns random fabrication time each time
     # calculating time for HQ to track_B - getting new parts
     base_delivery_time_B = transport_time("HQ", track_B, "air")
     base_delivery_time_B += fabrication_time
