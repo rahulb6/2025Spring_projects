@@ -26,7 +26,6 @@ severity_threshold = config['severity_threshold']
 dist_threshold = config['distance_threshold_km']
 n_simulations = config['no_of_simulations']
 
-
 #-------------------------------------------------HELPER FNS-----------------------------------------------------------
 def pert_sample(best_case, most_likely, worst_case):
     """
