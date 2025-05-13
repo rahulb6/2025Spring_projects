@@ -13,9 +13,9 @@ Here is how we've designed the RedBull's logistics (Imagine you are the team's L
 and if the distance between the locations is less than 4000Km; airways in any other case.
 
 TODO: combination hypothesis
-TODO: configure
-TODO: expand results
-TODO: API and cache circuit_dict
+TODO: configure?
+TODO: expand results?
+TODO: API and cache circuit_dict?
 TODO: document
 TODO: retest all DOCTESTS
 """
@@ -337,8 +337,6 @@ def simulate_disturbance(track_A, track_B, mode, verbose=False):
     Disturbance occurred during transport (ROAD)!
     Duration: ..., Severity: ..., Extra delay: ...
 
-    >>> isinstance(t, float)
-    True
     """
     race_cancellation_flag = False
     severity = pert_sample(0.1, 0.2, 1.1)  # Severity multiplier
@@ -370,6 +368,19 @@ def simulate_disturbance(track_A, track_B, mode, verbose=False):
 def race_cancellation_simulator(track_A):
     """
     If race at track_B is cancelled, this finds track_C (track_A + 2) and determines transport mode.
+    :param track_A: name of circuit A, which is the race previous to the race that got cancelled
+    :return: new race destination and mode of transportation to that place
+
+    >>> result = race_cancellation_simulator("Circuit de Monaco")
+    >>> isinstance(result, tuple) and len(result) == 2
+    True
+    >>> result[1] in ['road', 'air']
+    True
+
+    >>> race_cancellation_simulator("Yas Marina Circuit")  # doctest: +ELLIPSIS
+    Traceback (most recent call last):
+    ...
+    IndexError: Not enough races left in the calendar to skip to track C.
     """
     circuit_names = list(circuit_dict.keys())
     index = circuit_names.index(track_A)
@@ -405,6 +416,17 @@ def simulator(crash, breakdown, disturbance, verbose=False):
     :param disturbance: 0 or 1. If 1, simulates an external disturbance such as customs or weather delay.
 
     :return: float. Total time (in hours) taken for transport including base time and any applicable delays.
+
+    >>> simulator(0, 0, 2)  # Invalid value
+    Traceback (most recent call last):
+    ...
+    UnboundLocalError: cannot access local variable 'total_time' where it is not associated with a value
+
+    >>> t = simulator(0, 0, 0)
+    >>> isinstance(t, float)
+    True
+    >>> t >= 0
+    True
     """
     # Get tracks and their information
     (track_A, track_A_date, track_A_continent,
@@ -465,10 +487,7 @@ def simulator(crash, breakdown, disturbance, verbose=False):
         total_time, race_cancellation_flag = simulate_disturbance(track_A, track_B, mode)
         if race_cancellation_flag:
             max_allowed_hours = 65
-    """
-    elif crash == 1 and breakdown == 1 and disturbance == 0:
-        total_time = max(simulate_crash(track_A, track_B, mode), simulate_breakdown(track_A, track_B, mode))
-    """
+
     # Final check against allowed max hours
     if total_time <= max_allowed_hours:
         verbose and print("Transport fits within allowed time limit.")
@@ -486,10 +505,17 @@ def plot_convergence(results, hypothesis_name):
 
     :param results: list[float] - A list of delivery times (in hours) from repeated simulation runs.
     :param hypothesis_name: str. A label indicating which hypothesis/scenario the data corresponds to.
-
     :return: displays a matplotlib plot with reference lines for 58 and 70 hour thresholds.
 
-    how to do doctest: don't or test for any calculations it does or test the return object of this function
+    >>> plot_convergence([], "Empty")  # gets nothing
+
+    >>> results = [1,2,3,4,5,6,7,8,9,10]
+    >>> running_avg = running_avg = np.cumsum(results) / np.arange(1, len(results) + 1)
+    >>> running_avg.tolist()
+    [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5]
+
+    >>> type(plot_convergence([1, 2, 3], "Test"))
+    <class 'NoneType'>
     """
     running_avg = np.cumsum(results) / np.arange(1, len(results) + 1)
 
@@ -509,8 +535,12 @@ def plot_histogram(results, hypothesis_name):
     Plots a histogram of delivery times to visualize the distribution of simulation results.
     :param results: list[float]. A list of delivery times (in hours) from simulation runs
     :param hypothesis_name: str. A label describing the simulation scenario
-
     :return: displays a histogram with ref lines for 58 (road, incl buffer) and 70 (air, incl buffer) hr thresholds.
+
+    >>> type(plot_histogram([1, 2, 3], "Test"))
+    <class 'NoneType'>
+
+    >>> plot_histogram([], "Empty")  # gets nothing
     """
     plt.figure(figsize=(8,6))
     plt.hist(results, bins=15, color='skyblue', edgecolor='black')
@@ -532,10 +562,9 @@ if __name__ == "__main__":
     # Updated hypotheses — only focus on crash, breakdown, disturbance
     hypotheses = {
         "Baseline (no crash, no breakdown, no disturbance)": (0, 0, 0),
-        "Crash only": (1, 0, 0),
-        "Breakdown only": (0, 1, 0),
-        "Disturbance only": (0, 0, 1),
-        #"Crash+Breakdown": (1, 1, 0)
+        "Hypothesis: Crash": (1, 0, 0),
+        "Hypothesis: Breakdown": (0, 1, 0),
+        "Hypothesis: Disturbance": (0, 0, 1),
     }
 
     for hypo_name, params in hypotheses.items():
