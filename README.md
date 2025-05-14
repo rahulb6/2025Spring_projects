@@ -61,6 +61,8 @@ Upon running the simulation for all hypothesis, these are the results and interp
 1. Minimum Delivery Time Comparison: When analyzing the minimum delivery times across scenarios, we observe that both H2: Breakdown and H3: Disturbance cases yield delivery times that are close to the H0: Baseline scenario. However, in the case of a H1: Crash, the minimum delivery time is significantly higher. We believe,that this deviation is primarily attributed to the fabrication time required to replace damaged and depleted components, which inherently adds a delay even under the best conditions.
 2. Convergence Behavior (Mean Delivery Time): The mean delivery time or convergence point across simulations reinforces this pattern. While H2: Breakdowns and H3: Disturbances introduce minor delays—adding just a few hours over the H0: Baseline - the H1: Crash scenario results in a notably higher mean delivery time. This again highlights the impact of fabrication on the overall delivery duration.
 
+Note: The assumed values and the thresholds can be changed by accessing the config.yaml file
+
 **REFERENCES:**
 To understand the stakes of logistics :
 1. https://www.youtube.com/watch?v=n6uWuL4_pDI
