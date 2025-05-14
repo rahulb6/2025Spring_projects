@@ -44,11 +44,11 @@ Reasoning Behind Simulation Constraints and Hypothesis Design
 2. 4000 km Distance Threshold: One might ask, Why not allow road transport for distances beyond 4000 km, especially if time allows? While it is technically possible to cover longer distances by road, such an approach would be inefficient and environmentally unsustainable. Formula One and its partners (e.g., DHL, Ceva Logistics) are committed to sustainability. Flying cargo over such long distances not only reduces time but also aligns with F1's broader carbon reduction goals by optimizing fuel usage and minimizing continuous overland emissions.
 
 Flow of Events:
-Crash Hypothesis: When a crash occurs, spare parts must be fabricated and delivered urgently from Red Bull HQ. This is treated as a priority shipment, and thus always uses air transport, regardless of location. Meanwhile, non-damaged components from the previous track are transported based on the standard route logic (road or air).
+1. Crash Hypothesis: When a crash occurs, spare parts must be fabricated and delivered urgently from Red Bull HQ. This is treated as a priority shipment, and thus always uses air transport, regardless of location. Meanwhile, non-damaged components from the previous track are transported based on the standard route logic (road or air).
 
-Breakdown Hypothesis: A mechanical failure in the transport vehicle (truck or cargo plane) is simulated. The failure is addressed and the delivery resumes after a while. The resulting delay is sampled using a PERT distribution to reflect the randomness in breakdown recovery duration.
+2. Breakdown Hypothesis: A mechanical failure in the transport vehicle (truck or cargo plane) is simulated. The failure is addressed and the delivery resumes after a while. The resulting delay is sampled using a PERT distribution to reflect the randomness in breakdown recovery duration.
 
-Disturbance Hypothesis: Simulates events such as customs delays, protests, or severe weather. A "severity factor" determines the scale of the disturbance. If the severity exceeds a threshold (1 in our case), the following race is considered cancelled, and logistics are re-routed to the race after that. The new route also experiences a reduced disturbance to reflect real-world handling of back-to-back logistical shifts.
+3. Disturbance Hypothesis: Simulates events such as customs delays, protests, or severe weather. A "severity factor" determines the scale of the disturbance. If the severity exceeds a threshold (1 in our case), the following race is considered cancelled, and logistics are re-routed to the race after that. The new route also experiences a reduced disturbance to reflect real-world handling of back-to-back logistical shifts.
 Note: This cancellation event is rare and might not appear even in 5000 simulation runs. For testing, set verbose=True in the simulate_disturbance() function to observe such occurrences when they occur.
 
 **VALIDATION PHASE**
