@@ -42,11 +42,3 @@ Notes:
 
 - The simulation was designed to mimic the planning decisions a real F1 logistics manager would take.
 
-Citation:
-This project references:
-
- - DHL F1 Transport Logistics case studies
-
- - FIA regulations on race event timelines
-
- - Publicly available F1 documentaries
