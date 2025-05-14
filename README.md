@@ -68,13 +68,13 @@ Note: The assumed values and the thresholds can be changed by accessing the conf
 To understand the stakes of logistics :
 1. https://www.youtube.com/watch?v=n6uWuL4_pDI
 2. https://www.youtube.com/watch?v=6OLVFa8YRfM
-3. https://www.youtube.com/watch?v=m8p3vRsXz1k
+3. https://www.youtube.com/watch?v=m8p3vRsXz1k  
 Be sure to check out the map.py too!
 4. 2025 Race calendar: https://www.formula1.com/en/racing/2025
 5. PERT: https://real-statistics.com/binomial-and-related-distributions/pert-distribution/
 6. Geodesic s12: https://geographiclib.sourceforge.io/html/python/examples.html
 7. Article used to assume roadways speed range: https://dhl-freight-connections.com/en/business/truck-speed-limits-europe/
 8. Article used to assume roadways speed within city limits: https://www.bts.gov/browse-statistical-products-and-data/info-gallery/average-truck-speed-mph-bottleneck-locations
-9. Article used to assume cargo plane speeds: https://www.freightcourse.com/largest-cargo-planes/
+9. Article used to assume cargo plane speeds: https://www.freightcourse.com/largest-cargo-planes/  
 Other references:
 10. https://www.calculator.net/distance-calculator.html?la1=-37.8497&lo1=144.968&la2=31.3389&lo2=121.2189&lad1=38&lam1=53&las1=51.36&lau1=n&lod1=77&lom1=2&los1=11.76&lou1=w&lad2=39&lam2=56&las2=58.56&lau2=n&lod2=75&lom2=9&los2=1.08&lou2=w&type=3&ctype=dec&x=Calculate#latlog
