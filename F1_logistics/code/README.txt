@@ -10,7 +10,6 @@ Libraries Used:
 | geographiclib | Great-circle distance calculation |
 | folium        | Interactive circuit map generation|
 
-
 HOW TO RUN:
 1. Install the required Python libraries:
    pip install -r requirements.txt
@@ -18,7 +17,9 @@ HOW TO RUN:
 2. Edit any configuration values if needed in config.yaml (example: number of simulations, HQ coordinates, distance thresholds).
 
 3. Run the simulation:
-   python main.py
+   Step1: Try map.py
+   Step2: Run gen_circuit_details.py
+   STep3: Run main.py
 
 Notes:
 - PERT distributions were used to simulate randomness with a bias toward the most likely outcome.
