@@ -3,7 +3,6 @@ IS597 Spring 2025 - Final Project
 14th May 2025
 F1 Logistics using Monte Carlo Simulation
 Authors: Anushree Udhayakumar(au11) & Rahul Balasubramani(rahulb6)
-TODO: comments, documentation, citations
 """
 import random
 import matplotlib.pyplot as plt
@@ -123,7 +122,7 @@ def valid_tracks():
     circuit_names = list(circuit_dict.keys())
 
     # Pick a random index except the last one
-    index = random.randint(0, len(circuit_names) - 2) #no last track
+    index = random.randint(0, len(circuit_names) - 2)
 
     track_A = circuit_names[index]
     track_B = circuit_names[index + 1]
@@ -136,7 +135,7 @@ def valid_tracks():
 
 def transport_time(loc_A, loc_B, mode):
     """
-    Calculates transport time (in hours) from loc_A to loc_B. Simulator decided the mode (road/air) and sent it here.
+    Calculates transport time (in hours) from loc_A to loc_B. Simulator decided the mode (road/air) and passed it here.
     :param loc_A: name of circuit A, later changed to "HQ"
     :param loc_B: name of circuit B
     :param mode: air or road
@@ -218,7 +217,8 @@ def transport_time(loc_A, loc_B, mode):
 #def simulate_crash(track_A, track_B, breakdown, disturbance):
 def simulate_crash(track_A, track_B, mode, verbose=False):
     """
-    Simulates a crash scenario where spare parts need to be fabricated and flown from HQ to the next track.
+    Simulates a crash scenario where spare parts need to be fabricated and flown from HQ to the next track. And the
+    non - damaged parts should get delivered from the previous race location.
     Always assumes air transport due to urgency.
     :param: track_A: name of circuit A
     :param: track_B: name of circuit B
@@ -247,11 +247,14 @@ def simulate_crash(track_A, track_B, mode, verbose=False):
 
     # calculating time for track_A to track_B - moving the non-damaged parts
     base_delivery_time_A = transport_time(track_A, track_B, mode)
+
     # Fabrication time
-    fabrication_time = fabrication()  # Returns random fabrication time each time
+    fabrication_time = fabrication()  # returns random fabrication time each time
+
     # calculating time for HQ to track_B - getting new parts
     base_delivery_time_B = transport_time("HQ", track_B, "air")
     base_delivery_time_B += fabrication_time
+
     if verbose:
         print(f"Transport time (transport time from [track_A to track_B] and [HQ to track_B incl fabrication]): {base_delivery_time_A:.2f} hrs and {base_delivery_time_B:.2f} hrs")
 
@@ -260,6 +263,7 @@ def simulate_crash(track_A, track_B, mode, verbose=False):
 
     if verbose:
         print(f"Total recovery and delivery time: {total_delay_time:.2f} hrs")
+
     return round(total_delay_time, 2)
 
 def simulate_breakdown(track_A, track_B, mode, verbose=False):
@@ -302,6 +306,7 @@ def simulate_breakdown(track_A, track_B, mode, verbose=False):
     breakdown_delay = pert_sample(best, most_likely, worst)
     if verbose:
         print(f"Breakdown occurred during transport ({mode.upper()})! Extra delay: {breakdown_delay:.2f} hrs")
+
     total_time = base_delivery_time + breakdown_delay
     return round(total_time, 2)
 
@@ -330,12 +335,12 @@ def simulate_disturbance(track_A, track_B, mode, verbose=False):
     Duration: ..., Severity: ..., Extra delay: ...
 
     """
-    race_cancellation_flag = False
+    race_cancellation_flag = False # initially set to false
     severity = pert_sample(0.1, 0.2, 1.1)  # Severity multiplier
     if severity > severity_threshold:
         if verbose:
             print(f"Race at {track_B} cancelled due to extreme disturbance.")
-            race_cancellation_flag = True
+            race_cancellation_flag = True  # becomes true in the few iterations where severity is > threshold set
         track_B, mode = race_cancellation_simulator(track_A)
         if verbose:
             print(f"Transporting to {track_B} now.")
@@ -402,11 +407,11 @@ def race_cancellation_simulator(track_A):
 def simulator(crash, breakdown, disturbance, verbose=False):
     """
     Simulates transport between two consecutive F1 races. Handles crash recovery, breakdowns, and disturbances.
-    Dynamically chooses transport mode (road or air) based on distance + continent.
+    Dynamically chooses transport mode (road or air) based on distance + continent. and finds the deadline for
+    delivery based on the no.of days till next race.
     :param crash: 0 or 1. If 1, simulates a crash at the source track that requires spare parts delivery from HQ.
     :param breakdown: 0 or 1. If 1, simulates a breakdown delay during normal transport.
     :param disturbance: 0 or 1. If 1, simulates an external disturbance such as customs or weather delay.
-
     :return: float. Total time (in hours) taken for transport including base time and any applicable delays.
 
     >>> simulator(0, 0, 2)  # Invalid value

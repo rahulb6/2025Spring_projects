@@ -1,6 +1,6 @@
 from geographiclib.geodesic import Geodesic
 
-# Updated Circuits List (Name, Latitude, Longitude, Continent, RaceDate)
+# Circuits List (Name, Latitude, Longitude, Continent, RaceDate)
 circuits = [
     ("Melbourne Grand Prix Circuit", -37.8497, 144.968, "Oceania", "2025-03-16"),
     ("Shanghai International Circuit", 31.3389, 121.2189, "Asia", "2025-03-23"),
@@ -28,7 +28,6 @@ circuits = [
     ("Yas Marina Circuit", 24.4672, 54.6031, "Asia", "2025-12-08")
 ]
 
-
 # Initialize circuit dictionary
 circuit_dict = {}
 
@@ -41,4 +40,5 @@ for i, (name, lat, lon, continent, race_date) in enumerate(circuits):
     }
 
 if __name__ == "__main__":
+    # if you want to print the created circuit dictionary
     print(circuit_dict)
