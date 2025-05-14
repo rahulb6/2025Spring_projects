@@ -22,11 +22,6 @@ HOW TO RUN:
    STep3: Run main.py
 
 Notes:
-- PERT distributions were used to simulate randomness with a bias toward the most likely outcome.
-- All distances between tracks were calculated using real-world latitude-longitude coordinates and official F1 2025 calendar dates.
-- We introduced a config.yaml file for easily adjusting global simulation settings like number of simulations or threshold values. This gives you control without changing the code.
-- The simulation mimics decision-making by a real F1 team’s logistics and risk management department to decide whether to use road or air based on distance and continent logic.
 - All distances between tracks were calculated using real-world latitude-longitude coordinates and official F1 2025 calendar dates as seen in gen_circuit_details.py
 - We introduced a config.yaml file for easily adjusting global simulation settings like number of simulations or threshold values. It also allows you to easily change the assumed thresholds in one place without changing the code.
-
 --------------------------------------------------------------------------------
