@@ -1,44 +1,22 @@
-`main.py`
-The main simulation script:
-- Decides transport mode (road or air) based on distance and continent.
-- Simulates scenarios:
-    - Baseline (no delays)
-    - Crash + fabrication delay
-    - Breakdown delay
-    - Disturbance delay
-- Generates results as histograms and convergence plots.
-
-`gen_circuit_details.py`:
-Data file containing official 2025 F1 race information:
-- Race names
-- Race dates
-- Continents
-- Track latitude/longitude
-
-`map.py`:
-Utility to generate an interactive HTML map of the 2025 race circuits using `folium`.
-
 Libraries Used:
 
-| Library | Purpose |
-|--------|---------|
-| numpy | Random sampling and statistics |
-| matplotlib | Plotting results |
+| Library       | Purpose                           |
+|---------------|-----------------------------------|
+| numpy         | Random sampling and statistics    |
+| matplotlib    | Plotting results                  |
 | geographiclib | Great-circle distance calculation |
-| folium | Interactive circuit map generation |
+| folium        | Interactive circuit map generation|
 
-How to Run:
 
+HOW TO RUN:
 1. Install the required Python libraries:
-pip install -r requirements.txt
+   pip install -r requirements.txt
 
 2. Run the simulation:
-python main.py
+   python main.py
 
 Notes:
 - PERT distributions were used to simulate randomness with a bias toward the most likely outcome.
-
 - Race calendar and distances were calculated using actual coordinates and timelines.
-
 - The simulation was designed to mimic the planning decisions a real F1 logistics manager would take.
 
