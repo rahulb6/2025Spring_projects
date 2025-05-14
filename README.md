@@ -26,7 +26,7 @@ Fixed Variables:
   * Focused team: Red Bull Racing
   * Headquarters: Milton Keynes, UK
   * Reference calendar: F1 2025 schedule
-  * Delivery deadline: 58 hours for standard triple/double-headers; 65 hours for longer windows
+  * Delivery deadline: 58 hours for standard triple/double-headers; 65 hours for longer windows  
 Randomized Variables (with PERT distributions[5]):
   * Roadway and airway speeds [7][8][9]
   * Fabrication time (for parts post-crash)
