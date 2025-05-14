@@ -14,7 +14,9 @@ The real logistical test comes during:
 In these scenarios, cargo must be disassembled after Sunday’s race and transported overnight. The race may end at **1:00 PM** or as late as **1:00 AM**, leaving a transport window of roughly **48–58 hours** depending on local regulations and proximity. Although more time is available between spaced-out races, teams **do not take the full week** - doing so would be inefficient and risky. For this simulation, we use **65 hours as the upper limit** for all logistics scenarios to reflect the actual operational benchmark.
 
 **DESIGN PHASE**
+
 **Hypotheses**
+
 This simulation explores multiple real-world scenarios Red Bull Racing could face when transporting critical equipment between Formula 1 races, based on the 2025 calendar [4]. Each hypothesis reflects a plausible operational challenge in tight race-to-race turnaround windows.
 **H₀: Baseline Scenario (Validation Hypothesis)**: No crash occurred in the previous race, no breakdowns during transport, and no external disturbances. This serves as a reference case to validate the normal logistics pipeline under ideal conditions.
 **H₁: Crash and Spare Part Depletion**: A crash occurred at the previous race, and the team's spare parts inventory has been exhausted. New components must be fabricated at Red Bull’s headquarters in **Milton Keynes** and transported to the next race venue in time for assembly.
