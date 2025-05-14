@@ -15,13 +15,13 @@ In these scenarios, cargo must be disassembled after Sunday’s race and transpo
 
 **DESIGN PHASE**  
 **Hypotheses**  
-This simulation explores multiple real-world scenarios Red Bull Racing could face when transporting critical equipment between Formula 1 races, based on the 2025 calendar [4]. Each hypothesis reflects a plausible operational challenge in tight race-to-race turnaround windows.
-**H₀: Baseline Scenario (Validation Hypothesis)**: No crash occurred in the previous race, no breakdowns during transport, and no external disturbances. This serves as a reference case to validate the normal logistics pipeline under ideal conditions.
-**H₁: Crash and Spare Part Depletion**: A crash occurred at the previous race, and the team's spare parts inventory has been exhausted. New components must be fabricated at Red Bull’s headquarters in **Milton Keynes** and transported to the next race venue in time for assembly.
-**H₂: Breakdown During Transport**: A mechanical failure occurs during transport - either in road-based trucking or air cargo - causing delays. The simulation models the time taken to resolve the breakdown and resume delivery.
-**H₃: Unplanned External Disturbance**: Unexpected delays arise from events such as local protests, customs issues, or adverse weather all of which could lead to race cancellations. These are modeled using a **severity multiplier** which gets multiplied with base **disturbance duration** to reflect real-world variability of different disturbances. This hypothesis is meant to be general to compensate for all other misfortunes we did not design within this system.
+This simulation explores multiple real-world scenarios Red Bull Racing could face when transporting critical equipment between Formula 1 races, based on the 2025 calendar [4]. Each hypothesis reflects a plausible operational challenge in tight race-to-race turnaround windows.  
+**H₀: Baseline Scenario (Validation Hypothesis)**: No crash occurred in the previous race, no breakdowns during transport, and no external disturbances. This serves as a reference case to validate the normal logistics pipeline under ideal conditions.  
+**H₁: Crash and Spare Part Depletion**: A crash occurred at the previous race, and the team's spare parts inventory has been exhausted. New components must be fabricated at Red Bull’s headquarters in **Milton Keynes** and transported to the next race venue in time for assembly.  
+**H₂: Breakdown During Transport**: A mechanical failure occurs during transport - either in road-based trucking or air cargo - causing delays. The simulation models the time taken to resolve the breakdown and resume delivery.  
+**H₃: Unplanned External Disturbance**: Unexpected delays arise from events such as local protests, customs issues, or adverse weather all of which could lead to race cancellations. These are modeled using a **severity multiplier** which gets multiplied with base **disturbance duration** to reflect real-world variability of different disturbances. This hypothesis is meant to be general to compensate for all other misfortunes we did not design within this system.  
 
-**Simulation Setup**
+**Simulation Setup**  
 Fixed Variables:
   * Focused team: Red Bull Racing
   * Headquarters: Milton Keynes, UK
@@ -51,10 +51,10 @@ Flow of Events:
 3. Disturbance Hypothesis: Simulates events such as customs delays, protests, or severe weather. A "severity factor" determines the scale of the disturbance. If the severity exceeds a threshold (1 in our case), the following race is considered cancelled, and logistics are re-routed to the race after that. The new route also experiences a reduced disturbance to reflect real-world handling of back-to-back logistical shifts.
 Note: This cancellation event is rare and might not appear even in 5000 simulation runs. For testing, set verbose=True in the simulate_disturbance() function to observe such occurrences when they occur.
 
-**VALIDATION PHASE**
+**VALIDATION PHASE**  
 In the baseline scenario, where no crash, breakdown, or external disturbance occurred, the logistics system completed transportation in an average of 15.63 hours (note that this value may vary slightly with each run) across 500 simulations. Importantly, not a single run exceeded the assigned deadlines. This validates that the transport decision system - where roadways are preferred under specific conditions and airways otherwise - is effective and robust under normal operating circumstances, with a 100% success rate in meeting time constraints. The results of other hypotheses—such as crash recovery, breakdowns, or disturbances - will be assessed relative to this baseline, allowing us to quantify the additional time and risk introduced by each specific challenge (hypothesis) in the logistics design.
 
-**EXPERIMENT PHASE**
+**EXPERIMENT PHASE**  
 Upon running the simulation for all hypothesis, these are the results and interpretations:
 (Note that there is no numbers mentioned here, because they might differ every time you run the program)
 
@@ -63,7 +63,7 @@ Upon running the simulation for all hypothesis, these are the results and interp
 
 Note: The assumed values and the thresholds can be changed by accessing the config.yaml file
 
-**REFERENCES:**
+**REFERENCES:**  
 To understand the stakes of logistics :
 1. https://www.youtube.com/watch?v=n6uWuL4_pDI
 2. https://www.youtube.com/watch?v=6OLVFa8YRfM
