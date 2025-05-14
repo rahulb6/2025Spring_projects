@@ -15,10 +15,10 @@ In these scenarios, cargo must be disassembled after Sunday’s race and transpo
 
 **DESIGN PHASE**  
 **Hypotheses**  
-This simulation explores multiple real-world scenarios Red Bull Racing could face when transporting critical equipment between Formula 1 races, based on the 2025 calendar [4]. Each hypothesis reflects a plausible operational challenge in tight race-to-race turnaround windows.  
-**H₀: Baseline Scenario (Validation Hypothesis)**: No crash occurred in the previous race, no breakdowns during transport, and no external disturbances. This serves as a reference case to validate the normal logistics pipeline under ideal conditions.  
-**H₁: Crash and Spare Part Depletion**: A crash occurred at the previous race, and the team's spare parts inventory has been exhausted. New components must be fabricated at Red Bull’s headquarters in **Milton Keynes** and transported to the next race venue in time for assembly.  
-**H₂: Breakdown During Transport**: A mechanical failure occurs during transport - either in road-based trucking or air cargo - causing delays. The simulation models the time taken to resolve the breakdown and resume delivery.  
+This simulation explores multiple real-world scenarios Red Bull Racing could face when transporting critical equipment between Formula 1 races, based on the 2025 calendar [4]. Each hypothesis reflects a plausible operational challenge in tight race-to-race turnaround windows.    
+**H₀: Baseline Scenario (Validation Hypothesis)**: No crash occurred in the previous race, no breakdowns during transport, and no external disturbances. This serves as a reference case to validate the normal logistics pipeline under ideal conditions.    
+**H₁: Crash and Spare Part Depletion**: A crash occurred at the previous race, and the team's spare parts inventory has been exhausted. New components must be fabricated at Red Bull’s headquarters in **Milton Keynes** and transported to the next race venue in time for assembly.    
+**H₂: Breakdown During Transport**: A mechanical failure occurs during transport - either in road-based trucking or air cargo - causing delays. The simulation models the time taken to resolve the breakdown and resume delivery.    
 **H₃: Unplanned External Disturbance**: Unexpected delays arise from events such as local protests, customs issues, or adverse weather all of which could lead to race cancellations. These are modeled using a **severity multiplier** which gets multiplied with base **disturbance duration** to reflect real-world variability of different disturbances. This hypothesis is meant to be general to compensate for all other misfortunes we did not design within this system.  
 
 **Simulation Setup**  
